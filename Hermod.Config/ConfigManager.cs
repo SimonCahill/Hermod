@@ -12,26 +12,26 @@ namespace Hermod.Config {
     using System.IO;
     using System.Text;
     using System.Text.RegularExpressions;
-	using System.Xml.Linq;
+    using System.Xml.Linq;
 
     public partial class ConfigManager: INotifyPropertyChanged, IConfigChanged {
 
-		#region PropertyChanged
+        #region PropertyChanged
         public event PropertyChangedEventHandler? PropertyChanged;
 
         protected void OnPropertyChanged(string propName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
-		#endregion
+        #endregion
 
-		#region ConfigChanged
+        #region ConfigChanged
         public event ConfigChangedEventHandler? ConfigChanged;
 
         protected void OnConfigChanged(string configName, object? prevValue, object? newValue, Type cfgType) {
             ConfigChanged?.Invoke(this, new ConfigChangedEventArgs(configName, prevValue, newValue, cfgType));
         }
-		#endregion
+        #endregion
 
-		#region Defaults
-		const string DefaultConfigFileName  = ".hermod.json";
+        #region Defaults
+        const string DefaultConfigFileName  = ".hermod.json";
 
         private static FileInfo? _defaultConfigPathCache = null;
 
@@ -46,10 +46,10 @@ namespace Hermod.Config {
                                                       )
                 );
         }
-		#endregion
+        #endregion
 
-		#region Singleton
-		private static ConfigManager? _instance;
+        #region Singleton
+        private static ConfigManager? _instance;
 
         /// <summary>
         /// Gets the application-wide instance of the ConfigManager.
@@ -59,7 +59,7 @@ namespace Hermod.Config {
         /// </remarks>
         public static ConfigManager Instance => _instance ?? (_instance = new ConfigManager());
 
-		protected ConfigManager() {
+        protected ConfigManager() {
             m_configDictionary = new JObject();
             m_configFile = GetDefaultConfigPath();
             m_defaultConfig = LoadDefaultConfig();
@@ -84,7 +84,7 @@ namespace Hermod.Config {
             }
         }
 
-		private FileInfo? m_configFile = null;
+        private FileInfo? m_configFile = null;
         /// <summary>
         /// Gets or sets the current ConfigFile.
         /// </summary>
