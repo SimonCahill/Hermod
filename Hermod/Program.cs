@@ -12,16 +12,22 @@ namespace Hermod {
     using System.IO;
 	using System.Reflection;
 
+    /// <summary>
+    /// Hermod's entry point.
+    ///
+    /// Handles all pre-init steps and starts execution of the main business logic.
+    /// </summary>
     class Program {
 
-        private static string _shortOpts = "c:L:hv%U"; // the options used for this application
+        private static string _shortOpts = "c:L:hv%Ui"; // the options used for this application
         private static Option[] _longOpts = new[] {
             new Option { Name = "config",           ArgumentType = ArgumentType.Required,   Flag = IntPtr.Zero, Value = 'c' },
             new Option { Name = "log-lvl",          ArgumentType = ArgumentType.Required,   Flag = IntPtr.Zero, Value = 'L' },
             new Option { Name = "help",             ArgumentType = ArgumentType.None,       Flag = IntPtr.Zero, Value = 'h' },
             new Option { Name = "version",          ArgumentType = ArgumentType.None,       Flag = IntPtr.Zero, Value = 'v' },
             new Option { Name = "check-updates",    ArgumentType = ArgumentType.None,       Flag = IntPtr.Zero, Value = 'U' },
-            new Option { Name = "reset-cfg",        ArgumentType = ArgumentType.Optional,   Flag = IntPtr.Zero, Value = '%' }
+            new Option { Name = "reset-cfg",        ArgumentType = ArgumentType.Optional,   Flag = IntPtr.Zero, Value = '%' },
+            new Option { Name = "interactive",      ArgumentType = ArgumentType.None,       Flag = IntPtr.Zero, Value = 'i' }
             // add more as required
         };
 
@@ -29,12 +35,9 @@ namespace Hermod {
         private static ILogger? _appLogger = null;
         private static LogEventLevel? _logLevel = null;
         private static ConfigManager _cfgManager = ConfigManager.Instance;
+        private static bool _interactiveMode = false;
 
-        static int Main(string[] args) {
-
-            Console.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
-            return 0;
-
+        static async Task<int> Main(string[] args) {
             var returnCode = ParseArgs(args);
             if (returnCode != 0) { return returnCode - 1; }
 
@@ -42,23 +45,41 @@ namespace Hermod {
 
             InitialiseLogger();
 
-            var app = new Hermod(_cfgManager, _appLogger);
+            var app = new Hermod(_cfgManager, _appLogger) {
+                InteractiveMode = _interactiveMode,
+                m_keepAlive = true
+            };
+            app.StartUp();
 
-            return 0;
+            return await app.Execute();
         }
 
+        /// <summary>
+        /// Initialises the application's config manager.
+        /// </summary>
         static void InitialiseConfigs() {
             if (_overriddenConfigLocation != null) {
                 _cfgManager.ConfigFile = _overriddenConfigLocation;
             } else {
                 _cfgManager.LoadConfig();
             }
-
-            
         }
 
+        /// <summary>
+        /// Initialises the application's logger.
+        /// </summary>
         static void InitialiseLogger() {
-            _appLogger = Log.Logger;
+            var consoleSettings = _cfgManager.GetConsoleLoggerConfig();
+            var fileSettings = _cfgManager.GetFileLoggerConfig();
+            Core.Logger logger = new Core.Logger() {
+                ConsoleLogLevel = _logLevel ?? GetLogLevelFromArg(consoleSettings.LogLevel) ?? LogEventLevel.Warning,
+                EnableConsoleOutput = consoleSettings.EnableLogging,
+
+                FileLogLevel = GetLogLevelFromArg(fileSettings.LogLevel) ?? LogEventLevel.Information,
+                EnableFileOutput = fileSettings.EnableLogging
+            };
+
+            _appLogger = logger.GetLogger();
         }
 
         /// <summary>
@@ -101,9 +122,10 @@ namespace Hermod {
                             Console.Error.WriteLine("Missing argument for --log-lvl!");
                             return 2;
                         }
-                        if (!GetLogLevelFromArg(ref optArg)) {
-                            Console.Error.WriteLine($"Invalid argument found for log level! Default was set: { _logLevel.ToString().ToLowerInvariant() }");
-                        }
+                        _logLevel = GetLogLevelFromArg(optArg);
+                        break;
+                    case 'i':
+                        _interactiveMode = true;
                         break;
                     default:
                         Console.Error.WriteLine($"The argument { optChar } is not yet implemented!");
@@ -159,36 +181,27 @@ Arguments:
         /// </summary>
         /// <param name="arg">The argument to parse.</param>
         /// <returns><code >true</code> if an appropriate log level was found. <code >false</code> otherwise.</returns>
-        static bool GetLogLevelFromArg(ref string arg) {
-            arg = arg.ToLowerInvariant();
+        static LogEventLevel? GetLogLevelFromArg(string? arg) {
+            arg = arg?.ToLowerInvariant() ?? string.Empty;
 
             switch (arg) {
                 case "debug":
-                    _logLevel = LogEventLevel.Debug;
-                    break;
+                    return LogEventLevel.Debug;
                 case "trace":
-                    _logLevel = LogEventLevel.Verbose;
-                    break;
+                    return LogEventLevel.Verbose;
                 case "warn":
                 case "warning":
-                    _logLevel = LogEventLevel.Warning;
-                    break;
+                    return LogEventLevel.Warning;
                 case "error":
-                    _logLevel = LogEventLevel.Error;
-                    break;
+                    return LogEventLevel.Error;
                 case "info":
                 case "information":
-                    _logLevel = LogEventLevel.Information;
-                    break;
+                    return LogEventLevel.Information;
                 case "fatal":
-                    _logLevel = LogEventLevel.Fatal;
-                    break;
+                    return LogEventLevel.Fatal;
                 default:
-                    _logLevel = LogEventLevel.Warning;
-                    return false;
+                    return null;
             }
-
-            return true;
         }
 
     }
