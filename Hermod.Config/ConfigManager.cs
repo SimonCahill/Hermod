@@ -14,7 +14,38 @@ namespace Hermod.Config {
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
 
+    /// <summary>
+    /// Provides an application-wide, thread safe way of getting and setting configurations relevant to the main portions of the application.
+    ///
+    /// Thread-safety is guaranteed on a per-instance basis.
+    ///
+    /// Getters and setters provided by this class support use of dot-notation for configurations.
+    /// </summary>
+    /// <example >
+    /// Getting and setting values with and without dot-notation:
+    ///
+    /// <code >
+    /// void GetConfigWithDotNotation() {
+    ///     var cfg = ConfigManager.Instance.GetConfig<bool>("Object.Object.Object.Value");
+    /// }
+    ///
+    /// void GetConfigWithoutDotNotation() {
+    ///     var cfg = ConfigManager.Instance.GetConfig<bool>("Value");
+    /// }
+    ///
+    /// void SetConfigWithDotNotation() {
+    ///     ConfigManager.Instance.SetConfig<int>("Object.Object.Value", 123 ^ 456);
+    /// }
+    ///
+    /// void SetConfigWithoutDotNotation() {
+    ///     ConfigManager.Instance.SetConfig<object>("Value", new { ComplexType = new { WithMoreValues = true } });
+    /// }
+    /// </code>
+    /// </example>
     public partial class ConfigManager: INotifyPropertyChanged, IConfigChanged {
+
+        private readonly object m_lock;
+        private volatile string m_lockedBy;
 
         #region PropertyChanged
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -60,6 +91,8 @@ namespace Hermod.Config {
         public static ConfigManager Instance => _instance ?? (_instance = new ConfigManager());
 
         protected ConfigManager() {
+            m_lock = new object();
+            m_lockedBy = string.Empty;
             m_configDictionary = new JObject();
             m_configFile = GetDefaultConfigPath();
             m_defaultConfig = LoadDefaultConfig();
@@ -113,7 +146,11 @@ namespace Hermod.Config {
             if (!ConfigFile.Exists || ConfigFile.Length < 10) {
                 // this will happen for files that don't exist
                 // and files that are less than 10B
-                m_configDictionary = m_defaultConfig;
+                lock (m_lock) {
+                    m_lockedBy = nameof(LoadConfigAsync);
+                    m_configDictionary = m_defaultConfig;
+                    m_lockedBy = string.Empty;
+                }
                 await SaveConfigAsync();
                 return;
             }
@@ -127,7 +164,11 @@ namespace Hermod.Config {
                 }
 
                 try {
-                    m_configDictionary = JObject.Parse(sBuilder.ToString());
+                    lock (m_lock) {
+                        m_lockedBy = nameof(LoadConfigAsync);
+                        m_configDictionary = JObject.Parse(sBuilder.ToString());
+                        m_lockedBy = string.Empty;
+                    }
                 } catch (Exception ex) {
                     Console.Error.WriteLine("An error occurred while loading configs! Loading defaults!");
                     Console.Error.WriteLine($"Error message: { ex.Message }");
@@ -146,7 +187,11 @@ namespace Hermod.Config {
             if (!ConfigFile.Exists || ConfigFile.Length < 10) {
                 // this will happen for files that don't exist
                 // and files that are less than 10B
-                m_configDictionary = m_defaultConfig;
+                lock (m_lock) {
+                    m_lockedBy = nameof(LoadConfig);
+                    m_configDictionary = m_defaultConfig;
+                    m_lockedBy = string.Empty;
+                }
                 SaveConfig();
                 return;
             }
@@ -160,7 +205,11 @@ namespace Hermod.Config {
                 }
 
                 try {
-                    m_configDictionary = JObject.Parse(sBuilder.ToString());
+                    lock (m_lock) {
+                        m_lockedBy = nameof(LoadConfig);
+                        m_configDictionary = JObject.Parse(sBuilder.ToString());
+                        m_lockedBy = string.Empty;
+                    }
                 } catch (Exception ex) {
                     Console.Error.WriteLine("An error occurred while loading configs! Loading defaults!");
                     Console.Error.WriteLine($"Error message: { ex.Message }");
@@ -182,7 +231,12 @@ namespace Hermod.Config {
         public async Task SaveConfigAsync() {
             using (var cfgFile = ConfigFile.Open(FileMode.Truncate))
             using (var sWriter = new StreamWriter(cfgFile)) {
-                var serialisedData = JsonConvert.SerializeObject(m_configDictionary);
+                string serialisedData;
+                lock (m_lock) {
+                    m_lockedBy = nameof(SaveConfigAsync);
+                    serialisedData = JsonConvert.SerializeObject(m_configDictionary);
+                    m_lockedBy = string.Empty;
+                }
                 await sWriter.WriteLineAsync(serialisedData);
             }
         }
@@ -196,7 +250,12 @@ namespace Hermod.Config {
         public void SaveConfig() {
             using (var cfgFile = ConfigFile.Open(FileMode.Truncate))
             using (var sWriter = new StreamWriter(cfgFile)) {
-                var serialisedData = JsonConvert.SerializeObject(m_configDictionary);
+                string serialisedData;
+                lock (m_lock) {
+                    m_lockedBy = nameof(SaveConfig);
+                    serialisedData = JsonConvert.SerializeObject(m_configDictionary);
+                    m_lockedBy = string.Empty;
+                }
                 sWriter.WriteLine(serialisedData);
             }
         }
@@ -228,6 +287,15 @@ namespace Hermod.Config {
         /// <param name="configValue">The new value for the config.</param>
         public void SetConfig<T>(string configName, T? configValue) => SetConfig<T>(configName, configValue, ref m_configDictionary);
 
+        /// <summary>
+        /// Adds or sets a given configuration to a value determined by <paramref name="configValue"/>.
+        /// </summary>
+        /// <typeparam name="T">Generic type parameter.</typeparam>
+        /// <param name="configName">The name of the config to add or modify; supports dot notation.</param>
+        /// <param name="configValue">The (new) value for the configuration.</param>
+        /// <param name="dict">A reference to the object to modify.</param>
+        /// <exception cref="ArgumentNullException">If a passed argument is null or empty.</exception>
+        /// <exception cref="ConfigException">If an unexpected error occurs.</exception>
         protected void SetConfig<T>(string configName, T? configValue, ref JObject dict) {
             if (string.IsNullOrEmpty(configName) || string.IsNullOrWhiteSpace(configName)) {
                 throw new ArgumentNullException(nameof(configName), "The config name must not be null or empty!");
@@ -250,7 +318,11 @@ namespace Hermod.Config {
                     return;
                 } else if (subConfigHasDotNotation) {
                     // the desired object doesn't exist, so we'll have to add it
-                    dict.Add(container, new JObject()); // add a new object and then recursively call this method so the first condition is true
+                    lock (m_lock) {
+                        m_lockedBy = nameof(SetConfig);
+                        dict.Add(container, new JObject()); // add a new object and then recursively call this method so the first condition is true
+                        m_lockedBy = string.Empty;
+                    }
                     SetConfig<T>(configName, configValue, ref dict);
                     return;
                 }
@@ -260,14 +332,20 @@ namespace Hermod.Config {
             }
 
             if (!dict.ContainsKey(configName)) {
-                dict.Add(configName, JToken.FromObject(configValue));
+                lock (m_lock) {
+                    m_lockedBy = nameof(SetConfig);
+                    dict.Add(configName, JToken.FromObject(configValue));
+                    m_lockedBy = string.Empty;
+                }
                 return;
             }
 
-            dict["configName"] = JToken.FromObject(configValue);
+            lock (m_lock) {
+                m_lockedBy = nameof(SetConfig);
+                dict["configName"] = JToken.FromObject(configValue);
+                m_lockedBy = string.Empty;
+            }
         }
-
-
 
         /// <summary>
         /// Retrieves a single configuration.
@@ -304,7 +382,11 @@ namespace Hermod.Config {
                 throw new ConfigNotFoundException(configName, "Could not find requested config key!");
             }
 
-            var config = dict[configName];
+            lock (m_lock) {
+                m_lockedBy = nameof(GetConfig);
+                var config = dict[configName];
+                m_lockedBy = string.Empty;
+            }
 
             return config.ToObject<T>();
         }
