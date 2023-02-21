@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hermod.Core", "Hermod.Core\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hermod.Config.Tests", "Hermod.Config.Tests\Hermod.Config.Tests.csproj", "{1D308349-5416-41DB-8336-54390B579EAF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hermod.PluginFramework", "Hermod.PluginFramework\Hermod.PluginFramework.csproj", "{B72328E3-3E74-49B6-9F06-F3E500F5DCAE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{1D308349-5416-41DB-8336-54390B579EAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D308349-5416-41DB-8336-54390B579EAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1D308349-5416-41DB-8336-54390B579EAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B72328E3-3E74-49B6-9F06-F3E500F5DCAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B72328E3-3E74-49B6-9F06-F3E500F5DCAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B72328E3-3E74-49B6-9F06-F3E500F5DCAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B72328E3-3E74-49B6-9F06-F3E500F5DCAE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
