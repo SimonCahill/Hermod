@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Serilog.Sinks.File" />
+    <None Remove="Serilog.Sinks.Console" />
+    <None Remove="Serilog.Sinks.Debug" />
+    <None Remove="Serilog.Sinks.RollingFile" />
+    <None Remove="Serilog.Sinks.Async" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
+    <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
+    <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
+    <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
+  </ItemGroup>
+</Project>

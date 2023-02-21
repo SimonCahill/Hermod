@@ -1,0 +1,73 @@
+﻿////////////////////////////////////////////
+// Default configuration file for Hermod. //
+//                                        //
+// This file may (or may not) changed     //
+// between versions. Hermod will fall     //
+// to using default values when configs   //
+// cannot be found in the current file.   //
+// If this is the case, the default value //
+// will be written to the dictionary and  //
+// will be saved to disk.                 //
+//                                        //
+// © Simon Cahill 2023                    //
+////////////////////////////////////////////
+
+
+{
+  "Plugins": {
+    "PluginRepository": {
+      "Url": "https://hermod.simonc.eu/plugin_repository"
+    },
+    "IgnoreList": [
+      // enter any plugins you don't want to load on startup here
+    ],
+    "InstallDir": null // leave this as null to use the default!
+  },
+
+  "Logging": {
+    "ConsoleLogging": {
+      "EnableLogging": true,
+      "LogLevel": "warning"
+    },
+
+    "FileLogging": {
+      "EnableLogging": false,
+      "LogLevel": "information",
+
+      // the log file location
+      // legal values:
+      //  - "sysdefault" -> automatically choose the correct location. E.g. /var/log/ on Linux
+      //  - "hermoddir" -> ${home_dir}/.hermod/ or whatever is configured at runtime
+      //  - /a/valid/path/to/log/dir
+      "LogLocation": "sysdefault",
+      "LogFileName": "hermod.log"
+    }
+  },
+
+  "Terminal": {
+    "EnableInteractive": true, // enables interactive mode on the console
+  },
+
+  "Accounts": {
+    "EncryptData": true,
+    "EncryptionAlgo": null, // leave this to null to automatically set a default - will be filled out by Hermod!
+    "EncryptionSalt": null, // leave this to null to automatically generate a good default - will be filled out by Hermod!
+
+    "UseDatabase": false,
+    "DatabaseInfo": {
+      "Host": "localhost",
+      "DatabaseName": "hermod",
+      "DatabaseUser": "hermod",
+      "DatabasePass": "hermod123" // for the love of all things good please change these!
+    },
+
+    "UseJsonFile": true,
+    "JsonFileInfo": {
+      "FilePath": null // leave this to null to use the default location
+    }
+  },
+
+  "Archival": {
+    "ArchivePath": null // setting this to null will cause Hermod to place the archive in the user directory
+  }
+}

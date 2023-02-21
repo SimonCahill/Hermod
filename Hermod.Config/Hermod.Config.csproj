@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Hermod.Core\Hermod.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Resources\" />
+    <None Remove="Resources\DefaultConfig.json" />
+    <None Remove="Newtonsoft.Json" />
+    <None Remove="Detail\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
+    <Folder Include="Detail\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\DefaultConfig.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+  </ItemGroup>
+</Project>
