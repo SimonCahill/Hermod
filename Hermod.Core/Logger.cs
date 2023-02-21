@@ -14,31 +14,31 @@ namespace Hermod.Core {
 		/// <summary>
 		/// Gets or sets a value indicating whether or not to enable console logging.
 		/// </summary>
-		bool EnableConsoleOutput { get; set; } = false;
+		public bool EnableConsoleOutput { get; set; } = false;
 
 		#if DEBUG
-		bool EnableDebugOutput { get; set; } = true;
+		public bool EnableDebugOutput { get; set; } = true;
 		#else
 		bool EnableDebugOutput { get; set; } = false;
 		#endif
 
-		bool EnableFileOutput { get; set; } = true;
+		public bool EnableFileOutput { get; set; } = true;
 
 		#if DEBUG
-		LogEventLevel ConsoleLogLevel { get; set; } = LogEventLevel.Warning;
+		public LogEventLevel ConsoleLogLevel { get; set; } = LogEventLevel.Warning;
 		#else
-		LogEventLevel ConsoleLogLevel { get; set; } = LogEventLevel.Debug;
+		public LogEventLevel ConsoleLogLevel { get; set; } = LogEventLevel.Debug;
 		#endif
 
-		LogEventLevel FileLogLevel { get; set; } = LogEventLevel.Information;
+		public LogEventLevel FileLogLevel { get; set; } = LogEventLevel.Information;
 
-		FileInfo? LogFilePath { get; set; } = null;
+		public FileInfo? LogFilePath { get; set; } = null;
 
-		long MaxLogFileSize { get; set; } = (long)Math.Pow(1024, 3) * 5; // default is 5MiB
+		public long MaxLogFileSize { get; set; } = (long)Math.Pow(1024, 3) * 5; // default is 5MiB
 
-		RollingInterval FileRollingInterval { get; set; } = RollingInterval.Day;
+		public RollingInterval FileRollingInterval { get; set; } = RollingInterval.Day;
 
-		bool RollOnFileSizeLimit { get; set; } = true;
+		public bool RollOnFileSizeLimit { get; set; } = true;
 
 		private ILogger? m_logger;
 
@@ -53,7 +53,7 @@ namespace Hermod.Core {
 		/// <summary>
 		/// Creates a new instance of the Serilog logger.
 		/// </summary>
-		protected void CreateLogger() {
+		protected ILogger CreateLogger() {
 			var logCfg = new LoggerConfiguration();
 			if (EnableConsoleOutput) {
 				logCfg.WriteTo.Console(ConsoleLogLevel, applyThemeToRedirectedOutput: true);
@@ -75,7 +75,15 @@ namespace Hermod.Core {
 			}
 
 			m_logger = logCfg.CreateLogger();
+			return m_logger;
 		}
+
+		/// <summary>
+		/// Gets the instance of the Serilog logger.
+		/// </summary>
+		/// <returns>An instance of <see cref="ILogger"/></returns>
+		public ILogger GetLogger() => m_logger ??= CreateLogger();
+
 	}
 }
 
