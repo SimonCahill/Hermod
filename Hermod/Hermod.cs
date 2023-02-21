@@ -28,14 +28,13 @@ namespace Hermod {
             m_appLogger = logger;
             m_keepAlive = true;
             InteractiveMode = configManager.GetConfig<bool>("Terminal.EnableInteractive");
+            m_inputCancellationToken = new CancellationTokenSource();
         }
 
         internal void StartUp() {
             SetTerminalTitle();
             m_appLogger.Information("Setting up OS event handlers...");
 			Console.CancelKeyPress += Console_CancelKeyPress;
-
-            m_inputCancellationToken = new CancellationTokenSource();
 
             m_appLogger.Information("Loading plugins...");
         }
