@@ -28,6 +28,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Hermod.Config\Hermod.Config.csproj" />
     <ProjectReference Include="..\Hermod.Core\Hermod.Core.csproj" />
+    <ProjectReference Include="..\Hermod.PluginFramework\Hermod.PluginFramework.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PluginFramework\" />
