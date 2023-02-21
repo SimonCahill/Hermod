@@ -229,6 +229,7 @@ namespace Hermod.Config {
         /// </remarks>
         /// <returns>An awaitable task.</returns>
         public async Task SaveConfigAsync() {
+            ConfigFile.Create().Close();
             using (var cfgFile = ConfigFile.Open(FileMode.Truncate))
             using (var sWriter = new StreamWriter(cfgFile)) {
                 string serialisedData;
@@ -248,6 +249,7 @@ namespace Hermod.Config {
         /// Note: saving configs here WILL remove all comments from the file!
         /// </remarks>
         public void SaveConfig() {
+            ConfigFile.Create().Close();
             using (var cfgFile = ConfigFile.Open(FileMode.Truncate))
             using (var sWriter = new StreamWriter(cfgFile)) {
                 string serialisedData;
@@ -382,9 +384,10 @@ namespace Hermod.Config {
                 throw new ConfigNotFoundException(configName, "Could not find requested config key!");
             }
 
+            JToken config;
             lock (m_lock) {
                 m_lockedBy = nameof(GetConfig);
-                var config = dict[configName];
+                config = dict[configName];
                 m_lockedBy = string.Empty;
             }
 
