@@ -221,6 +221,55 @@ namespace Hermod.Config {
         public T GetConfig<T>(string configName) => GetConfig<T>(configName, m_configDictionary);
 
         /// <summary>
+        /// Sets a given configuration to a value determined by <paramref name="configValue"/>.
+        /// </summary>
+        /// <typeparam name="T">The config type.</typeparam>
+        /// <param name="configName">The name of the configuration to modify or add. Supports dot notation.</param>
+        /// <param name="configValue">The new value for the config.</param>
+        public void SetConfig<T>(string configName, T? configValue) => SetConfig<T>(configName, configValue, ref m_configDictionary);
+
+        protected void SetConfig<T>(string configName, T? configValue, ref JObject dict) {
+            if (string.IsNullOrEmpty(configName) || string.IsNullOrWhiteSpace(configName)) {
+                throw new ArgumentNullException(nameof(configName), "The config name must not be null or empty!");
+            }
+
+            if (ConfigDotNotation().IsMatch(configName)) {
+                var periodPos = configName.IndexOf('.');
+                var container = configName.Substring(0, periodPos);
+                var subConfig = configName.Substring(periodPos + 1);
+                var subConfigHasDotNotation = ConfigDotNotation().IsMatch(subConfig);
+
+                if (dict.ContainsKey(container) && subConfigHasDotNotation) {
+                    var token = dict[container];
+                    if (token?.Type != JTokenType.Object) {
+                        throw new ConfigException($"Config type mismatch! Expected object; got { token?.Type.ToString() }");
+                    }
+
+                    var tokenObj = (JObject)token;
+                    SetConfig<T>(subConfig, configValue, ref tokenObj);
+                    return;
+                } else if (subConfigHasDotNotation) {
+                    // the desired object doesn't exist, so we'll have to add it
+                    dict.Add(container, new JObject()); // add a new object and then recursively call this method so the first condition is true
+                    SetConfig<T>(configName, configValue, ref dict);
+                    return;
+                }
+
+                // the object exists, but subConfig does not match config dot notation; call the method again so the value can be set
+                SetConfig<T>(subConfig, configValue, ref dict);
+            }
+
+            if (!dict.ContainsKey(configName)) {
+                dict.Add(configName, JToken.FromObject(configValue));
+                return;
+            }
+
+            dict["configName"] = JToken.FromObject(configValue);
+        }
+
+
+
+        /// <summary>
         /// Retrieves a single configuration.
         /// </summary>
         /// <typeparam name="T">The type of the config object</typeparam>
@@ -266,6 +315,10 @@ namespace Hermod.Config {
         /// <returns>An instance of <see cref="LoggerConfig"/> containing the logger configuration for the ConsoleLogger.</returns>
         public LoggerConfig GetConsoleLoggerConfig() => GetConfig<LoggerConfig>("Logging.ConsoleLogging");
 
+        /// <summary>
+        /// Gets the configurations specific to logger configuration.
+        /// </summary>
+        /// <returns>An instance of <see cref="LoggerConfig"/> containing the logger configuration for the FileLogger.</returns>
         public LoggerConfig GetFileLoggerConfig() => GetConfig<LoggerConfig>("Logging.FileLogging");
 
     }
