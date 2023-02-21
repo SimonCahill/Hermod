@@ -19,6 +19,7 @@
     <None Remove="Serilog.Sinks.RollingFile" />
     <None Remove="Newtonsoft.Json" />
     <None Remove="getopt.net-bsd" />
+    <None Remove="PluginFramework\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
@@ -27,5 +28,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Hermod.Config\Hermod.Config.csproj" />
     <ProjectReference Include="..\Hermod.Core\Hermod.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="PluginFramework\" />
   </ItemGroup>
 </Project>
