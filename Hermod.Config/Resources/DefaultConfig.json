@@ -55,10 +55,11 @@
 
     "UseDatabase": false,
     "DatabaseInfo": {
-      "Host": "localhost",
-      "DatabaseName": "hermod",
-      "DatabaseUser": "hermod",
-      "DatabasePass": "hermod123" // for the love of all things good please change these!
+        "Host": "localhost",
+        "DatabaseName": "hermod",
+        "DatabaseUser": "hermod",
+        "DatabasePass": "hermod123" // for the love of all things good please change these!,
+        "ConnectionTimeoutInSec": 30
     },
 
     "UseJsonFile": true,
