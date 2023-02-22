@@ -8,7 +8,6 @@ namespace Hermod.Config {
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
-    using System.ComponentModel;
     using System.IO;
     using System.Text;
     using System.Text.RegularExpressions;
@@ -42,15 +41,15 @@ namespace Hermod.Config {
     /// }
     /// </code>
     /// </example>
-    public partial class ConfigManager: INotifyPropertyChanged, IConfigChanged {
+    public partial class ConfigManager: IConfigLoaded, IConfigChanged {
 
         private readonly object m_lock;
         private volatile string m_lockedBy;
 
-        #region PropertyChanged
-        public event PropertyChangedEventHandler? PropertyChanged;
+        #region IConfigLoaded
+        public event ConfigLoadedEventHandler? ConfigLoaded;
 
-        protected void OnPropertyChanged(string propName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+        protected void OnConfigLoaded() => ConfigLoaded?.Invoke(this, new ConfigLoadedEventArgs());
         #endregion
 
         #region ConfigChanged
@@ -130,7 +129,6 @@ namespace Hermod.Config {
                 if (value == m_configFile) { return; }
 
                 m_configFile = value;
-                OnPropertyChanged(nameof(ConfigFile));
                 LoadConfig();
             }
         }
@@ -235,7 +233,7 @@ namespace Hermod.Config {
                 string serialisedData;
                 lock (m_lock) {
                     m_lockedBy = nameof(SaveConfigAsync);
-                    serialisedData = JsonConvert.SerializeObject(m_configDictionary);
+                    serialisedData = JsonConvert.SerializeObject(m_configDictionary, Formatting.Indented);
                     m_lockedBy = string.Empty;
                 }
                 await sWriter.WriteLineAsync(serialisedData);
@@ -255,7 +253,7 @@ namespace Hermod.Config {
                 string serialisedData;
                 lock (m_lock) {
                     m_lockedBy = nameof(SaveConfig);
-                    serialisedData = JsonConvert.SerializeObject(m_configDictionary);
+                    serialisedData = JsonConvert.SerializeObject(m_configDictionary, Formatting.Indented);
                     m_lockedBy = string.Empty;
                 }
                 sWriter.WriteLine(serialisedData);
@@ -279,7 +277,15 @@ namespace Hermod.Config {
         /// <typeparam name="T"></typeparam>
         /// <param name="configName"></param>
         /// <returns></returns>
-        public T GetConfig<T>(string configName) => GetConfig<T>(configName, m_configDictionary);
+        public T GetConfig<T>(string configName) {
+            try {
+                return GetConfig<T>(configName, m_configDictionary);
+            } catch (ConfigNotFoundException) {
+                return GetConfig<T>(configName, m_defaultConfig); // no point in catching anything here
+            } catch {
+                throw;
+            }
+        }
 
         /// <summary>
         /// Sets a given configuration to a value determined by <paramref name="configValue"/>.
@@ -339,14 +345,17 @@ namespace Hermod.Config {
                     dict.Add(configName, JToken.FromObject(configValue));
                     m_lockedBy = string.Empty;
                 }
+                ConfigChanged?.Invoke(this, new ConfigChangedEventArgs(configName, null, configValue, typeof(T)));
                 return;
             }
 
+            var prevValue = dict[configName];
             lock (m_lock) {
                 m_lockedBy = nameof(SetConfig);
-                dict["configName"] = JToken.FromObject(configValue);
+                dict[configName] = JToken.FromObject(configValue);
                 m_lockedBy = string.Empty;
             }
+            ConfigChanged?.Invoke(this, new ConfigChangedEventArgs(configName, prevValue, configValue, typeof(T)));
         }
 
         /// <summary>
@@ -394,11 +403,12 @@ namespace Hermod.Config {
             return config.ToObject<T>();
         }
 
-        /// <summary>
-        /// Gets the configurations specific to logger configuration.
-        /// </summary>
-        /// <returns>An instance of <see cref="LoggerConfig"/> containing the logger configuration for the ConsoleLogger.</returns>
-        public LoggerConfig GetConsoleLoggerConfig() => GetConfig<LoggerConfig>("Logging.ConsoleLogging");
+		#region Special Accessors
+		/// <summary>
+		/// Gets the configurations specific to logger configuration.
+		/// </summary>
+		/// <returns>An instance of <see cref="LoggerConfig"/> containing the logger configuration for the ConsoleLogger.</returns>
+		public LoggerConfig GetConsoleLoggerConfig() => GetConfig<LoggerConfig>("Logging.ConsoleLogging");
 
         /// <summary>
         /// Gets the configurations specific to logger configuration.
@@ -406,6 +416,23 @@ namespace Hermod.Config {
         /// <returns>An instance of <see cref="LoggerConfig"/> containing the logger configuration for the FileLogger.</returns>
         public LoggerConfig GetFileLoggerConfig() => GetConfig<LoggerConfig>("Logging.FileLogging");
 
-    }
+        /// <summary>
+        /// Special accessor for config which may contain different values handleable by Hermod.
+        /// </summary>
+        /// <returns>The install directory for plugins.</returns>
+        public DirectoryInfo GetPluginInstallDir() {
+            var installDir = GetConfig<string?>("Plugins.InstallDir");
+
+            if (string.IsNullOrEmpty(installDir)) {
+                installDir = AppInfo.GetLocalHermodDirectory().CreateSubdirectory(AppInfo.HermodAppPluginDirName).FullName;
+                SetConfig<string>("Plugins.InstallDir", installDir);
+            }
+
+            return new DirectoryInfo(installDir);
+        }
+
+		#endregion
+
+	}
 }
 
