@@ -19,7 +19,7 @@ namespace Hermod.Config.Detail {
 
         LogEventLevel LogEventLevel {
             get {
-                switch (LogLevel.ToLowerInvariant()) {
+                switch (LogLevel?.ToLowerInvariant()) {
                     default:
                     case "warn":
                     case "warning":
