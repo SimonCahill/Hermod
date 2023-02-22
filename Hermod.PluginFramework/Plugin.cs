@@ -4,7 +4,7 @@ namespace Hermod.PluginFramework {
 
 	using Config;
 	using Core.Commands;
-
+	using Hermod.Core.Delegation;
 	using Serilog;
 
     /// <summary>
@@ -34,7 +34,7 @@ namespace Hermod.PluginFramework {
 		public List<ICommand> PluginCommands { get; protected set; }
 
 		/// <inheritdoc/>
-		public abstract void OnLoad(ILogger logger);
+		public abstract void OnLoad(IPluginDelegator pluginDelegator);
 
 		/// <inheritdoc/>
 		public abstract void OnStart();

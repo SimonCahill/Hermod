@@ -5,7 +5,7 @@ namespace Hermod.PluginFramework {
     using Config;
     using Core.Commands;
     using Core.Commands.Results;
-
+    using Hermod.Core.Delegation;
     using Serilog;
 
     /// <summary>
@@ -32,8 +32,8 @@ namespace Hermod.PluginFramework {
         /// Method that is called once the plugin has been loaded.
         /// This may be used for pre-init purposes.
         /// </summary>
-        /// <param name="logger" >The logger provided by Hermod for this plugin.</param>
-        void OnLoad(ILogger logger);
+        /// <param name="pluginDelegator" >The delegator allocated to this plugin.</param>
+        void OnLoad(IPluginDelegator pluginDelegator);
 
         /// <summary>
         /// Method that is called once Hermod has completed its startup procedures and is ready to run.
