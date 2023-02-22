@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Hermod.Core\Hermod.Core.csproj" />
-    <ProjectReference Include="..\Hermod.Config\Hermod.Config.csproj" />
+    <ProjectReference Include="..\Hermod.PluginFramework\Hermod.PluginFramework.csproj" />
   </ItemGroup>
 </Project>

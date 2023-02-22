@@ -20,10 +20,12 @@
     <None Remove="Newtonsoft.Json" />
     <None Remove="getopt.net-bsd" />
     <None Remove="PluginFramework\" />
+    <None Remove="System.Reflection.Metadata" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="getopt.net-bsd" Version="0.2.0" />
+    <PackageReference Include="System.Reflection.Metadata" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Hermod.Config\Hermod.Config.csproj" />

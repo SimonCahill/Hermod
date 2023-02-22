@@ -16,6 +16,7 @@
     <None Remove="Newtonsoft.Json" />
     <None Remove="Commands\Results\" />
     <None Remove="getopt.net-bsd" />
+    <None Remove="Exceptions\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
@@ -29,5 +30,6 @@
   <ItemGroup>
     <Folder Include="Commands\" />
     <Folder Include="Commands\Results\" />
+    <Folder Include="Exceptions\" />
   </ItemGroup>
 </Project>
