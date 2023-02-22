@@ -19,6 +19,7 @@
     <None Remove="getopt.net-bsd" />
     <None Remove="Exceptions\" />
     <None Remove="Delegation\" />
+    <None Remove="Attributes\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
@@ -34,5 +35,6 @@
     <Folder Include="Commands\Results\" />
     <Folder Include="Exceptions\" />
     <Folder Include="Delegation\" />
+    <Folder Include="Attributes\" />
   </ItemGroup>
 </Project>
