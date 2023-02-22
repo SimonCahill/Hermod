@@ -17,7 +17,7 @@ namespace Hermod.Core.Commands.Results {
         /// The command's result.
         /// The result may be sent over the wire.
         /// </summary>
-        object Result { get; }
+        object? Result { get; }
 
     }
 
