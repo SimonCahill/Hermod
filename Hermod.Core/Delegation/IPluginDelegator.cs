@@ -85,7 +85,7 @@ namespace Hermod.Core.Delegation {
         /// <param name="config">The config name.</param>
         /// <param name="value">The config value.</param>
         /// <returns><code >true</code> if retrieving the configuration was successful. <code >false</code> otherwise.</returns>
-        bool TryGetApplicationConfig<T>(string config, out T value);
+        bool TryGetApplicationConfig<T>(string config, out T? value);
 
         /// <summary>
         /// Logs an information message to the logger.
