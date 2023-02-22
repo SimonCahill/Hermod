@@ -109,7 +109,11 @@ namespace Hermod.Config {
         /// </summary>
         /// <returns>The JObject containing the default configs.</returns>
         protected JObject LoadDefaultConfig() {
-            using (var rStream = typeof(ConfigManager).Assembly.GetManifestResourceStream("Hermod.Config.Resources.DefaultConfig.json"))
+            using var rStream = typeof(ConfigManager).Assembly.GetManifestResourceStream("Hermod.Config.Resources.DefaultConfig.json");
+            if (rStream is null) {
+                throw new Exception("Failed to load default configuration! Hermod will abort!");
+            }
+
             using (var sReader = new StreamReader(rStream)) {
                 var text = sReader.ReadToEnd();
                 return JObject.Parse(text);
