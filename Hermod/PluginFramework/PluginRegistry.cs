@@ -3,6 +3,7 @@
 namespace Hermod.PluginFramework {
 
 	using Config;
+    using Core.Commands;
     using Core.Exceptions;
 	using Serilog;
 
@@ -16,7 +17,7 @@ namespace Hermod.PluginFramework {
     /// This class knows which plugins are loaded at any given time, can all any
     /// commands provided by the plugin and also fire events.
     /// </summary>
-    internal sealed class PluginRegistry {
+    internal sealed partial class PluginRegistry {
 
         public ILogger? AppLogger { get; internal set; } = null;
 
@@ -52,6 +53,10 @@ namespace Hermod.PluginFramework {
         /// A <see cref="Dictionary{Assembly, List{IPlugin}}"/> containing all loaded assemblies and plugins contained within.
         /// </summary>
         internal Dictionary<Assembly, Dictionary<Type, IPlugin>> LoadedAssemblies { get; } = new Dictionary<Assembly, Dictionary<Type, IPlugin>>();
+
+        internal List<PluginDelegator> PluginDelegators { get; } = new List<PluginDelegator>();
+
+        internal List<ICommand>? BuiltInCommands { get; set; } = null;
 
         /// <summary>
         /// Gets or sets the last <see cref="IPlugin"/> to be registered.
@@ -134,10 +139,16 @@ namespace Hermod.PluginFramework {
 
             try {
                 var plugin = Activator.CreateInstance(type) as IPlugin;
+                if (plugin is null) {
+                    throw new PluginLoadException(type.Name);
+                }
+
                 LoadedAssemblies[assembly].Add(type, plugin);
+                var pluginDelegator = new PluginDelegator(plugin);
+                PluginDelegators.Add(pluginDelegator);
 
                 plugin = LoadedAssemblies[assembly][type];
-                plugin.OnLoad(AppLogger ?? Log.Logger);
+                plugin.OnLoad(pluginDelegator);
 
                 LastRegisteredPlugin = plugin;
                 AppLogger?.Information($"Loaded plugin { plugin.PluginName } { plugin.PluginVersion.ToString() }");
