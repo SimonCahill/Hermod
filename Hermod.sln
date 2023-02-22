@@ -91,5 +91,7 @@ Global
 		$0.TextStylePolicy = $5
 		$5.inheritsSet = null
 		$5.scope = text/x-web
+		description = Hermod is a modular, extensible and fully GDPR-compatible email archival system.
+		version = 0.0.1
 	EndGlobalSection
 EndGlobal
