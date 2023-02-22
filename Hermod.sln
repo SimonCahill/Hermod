@@ -1,0 +1,97 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 25.0.1704.2
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hermod", "Hermod\Hermod.csproj", "{605C7E11-6139-4DF4-86AD-A35CCFA382A5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hermod.Config", "Hermod.Config\Hermod.Config.csproj", "{56ECAF4F-EA3B-4D73-B08B-C83563EE0D82}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hermod.Core", "Hermod.Core\Hermod.Core.csproj", "{827063BB-30B3-438D-BC23-6997A2684AF4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hermod.Config.Tests", "Hermod.Config.Tests\Hermod.Config.Tests.csproj", "{1D308349-5416-41DB-8336-54390B579EAF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hermod.PluginFramework", "Hermod.PluginFramework\Hermod.PluginFramework.csproj", "{B72328E3-3E74-49B6-9F06-F3E500F5DCAE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{A9533FC8-44E0-4DFB-8C0C-47DF6476CE87}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hermod.TestPlugin", "Hermod.TestPlugin\Hermod.TestPlugin.csproj", "{6E6FE737-66EA-4592-9946-4C6CB4634D7F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{605C7E11-6139-4DF4-86AD-A35CCFA382A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{605C7E11-6139-4DF4-86AD-A35CCFA382A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{605C7E11-6139-4DF4-86AD-A35CCFA382A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{605C7E11-6139-4DF4-86AD-A35CCFA382A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56ECAF4F-EA3B-4D73-B08B-C83563EE0D82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56ECAF4F-EA3B-4D73-B08B-C83563EE0D82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56ECAF4F-EA3B-4D73-B08B-C83563EE0D82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56ECAF4F-EA3B-4D73-B08B-C83563EE0D82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{827063BB-30B3-438D-BC23-6997A2684AF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{827063BB-30B3-438D-BC23-6997A2684AF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{827063BB-30B3-438D-BC23-6997A2684AF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{827063BB-30B3-438D-BC23-6997A2684AF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D308349-5416-41DB-8336-54390B579EAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D308349-5416-41DB-8336-54390B579EAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D308349-5416-41DB-8336-54390B579EAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D308349-5416-41DB-8336-54390B579EAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B72328E3-3E74-49B6-9F06-F3E500F5DCAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B72328E3-3E74-49B6-9F06-F3E500F5DCAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B72328E3-3E74-49B6-9F06-F3E500F5DCAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B72328E3-3E74-49B6-9F06-F3E500F5DCAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E6FE737-66EA-4592-9946-4C6CB4634D7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E6FE737-66EA-4592-9946-4C6CB4634D7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E6FE737-66EA-4592-9946-4C6CB4634D7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E6FE737-66EA-4592-9946-4C6CB4634D7F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DF18AA6D-3312-49F5-A8CD-CD2D0ED8AA83}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6E6FE737-66EA-4592-9946-4C6CB4634D7F} = {A9533FC8-44E0-4DFB-8C0C-47DF6476CE87}
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		Policies = $0
+		$0.TextStylePolicy = $1
+		$1.TabsToSpaces = True
+		$1.EolMarker = Unix
+		$1.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $2
+		$2.NewLinesForBracesInTypes = False
+		$2.NewLinesForBracesInMethods = False
+		$2.NewLinesForBracesInProperties = False
+		$2.NewLinesForBracesInAccessors = False
+		$2.NewLinesForBracesInAnonymousMethods = False
+		$2.NewLinesForBracesInControlBlocks = False
+		$2.NewLinesForBracesInAnonymousTypes = False
+		$2.NewLinesForBracesInObjectCollectionArrayInitializers = False
+		$2.NewLinesForBracesInLambdaExpressionBody = False
+		$2.NewLineForElse = False
+		$2.NewLineForCatch = False
+		$2.NewLineForFinally = False
+		$2.NewLineForMembersInObjectInit = False
+		$2.NewLineForMembersInAnonymousTypes = False
+		$2.NewLineForClausesInQuery = False
+		$2.SpaceBeforeColonInBaseTypeDeclaration = False
+		$2.scope = text/x-csharp
+		$0.TextStylePolicy = $3
+		$3.FileWidth = 80
+		$3.TabsToSpaces = True
+		$3.scope = text/plain
+		$0.TextStylePolicy = $4
+		$4.inheritsSet = null
+		$4.scope = text/x-json
+		$0.TextStylePolicy = $5
+		$5.inheritsSet = null
+		$5.scope = text/x-web
+		description = Hermod is a modular, extensible and fully GDPR-compatible email archival system.
+		version = 0.0.1
+	EndGlobalSection
+EndGlobal
