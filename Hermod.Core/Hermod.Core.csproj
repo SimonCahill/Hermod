@@ -20,6 +20,7 @@
     <None Remove="Exceptions\" />
     <None Remove="Delegation\" />
     <None Remove="Attributes\" />
+    <None Remove="Accounts\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
@@ -36,5 +37,6 @@
     <Folder Include="Exceptions\" />
     <Folder Include="Delegation\" />
     <Folder Include="Attributes\" />
+    <Folder Include="Accounts\" />
   </ItemGroup>
 </Project>
