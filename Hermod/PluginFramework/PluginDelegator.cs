@@ -2,6 +2,8 @@
 
 namespace Hermod.PluginFramework {
 
+    using Config;
+    using Core.Commands.Results;
     using Core.Delegation;
     using Serilog;
 
@@ -33,10 +35,9 @@ namespace Hermod.PluginFramework {
         /// <inheritdoc/>
         public void SubscribeTopics(params string[] topics) {
             foreach (var topic in topics) {
-                try { PluginRegistry.Instance.AddSubscription(Plugin, topic); }
-                catch (Exception ex) {
-                    Error($"Subscription failed: { ex.Message }");
-                    Debug($"Stacktrace: { ex.StackTrace }");
+                try { PluginRegistry.Instance.AddSubscription(Plugin, topic); } catch (Exception ex) {
+                    Error($"Subscription failed: {ex.Message}");
+                    Debug($"Stacktrace: {ex.StackTrace}");
                 }
             }
         }
@@ -48,22 +49,37 @@ namespace Hermod.PluginFramework {
         public void PublishMessage(string topic, object? message) => PluginRegistry.Instance.OnMessagePublished(topic, message);
 
         /// <inheritdoc/>
-        public Core.Commands.Results.ICommandResult ExecuteCommand(params string[] command) => PluginRegistry.Instance.ExecuteCommand(command);
+        public ICommandResult ExecuteCommand(params string[] command) => PluginRegistry.Instance.ExecuteCommand(command);
 
         /// <inheritdoc/>
-		public void Information(string? msg) => Logger?.Information($"[{ Plugin.PluginName }] { msg }");
+		public void Information(string? msg) => Logger?.Information($"[{ Plugin.PluginName }] {msg}");
 
         /// <inheritdoc/>
-		public void Debug(string? msg) => Logger?.Debug($"[{ Plugin.PluginName }] { msg }");
+		public void Debug(string? msg) => Logger?.Debug($"[{ Plugin.PluginName }] {msg}");
 
         /// <inheritdoc/>
-		public void Error(string? msg) => Logger?.Error($"[{ Plugin.PluginName }] { msg }");
+		public void Error(string? msg) => Logger?.Error($"[{ Plugin.PluginName }] {msg}");
 
         /// <inheritdoc/>
-		public void Warning(string? msg) => Logger?.Warning($"[{ Plugin.PluginName }] { msg }");
+		public void Warning(string? msg) => Logger?.Warning($"[{ Plugin.PluginName }] {msg}");
 
         /// <inheritdoc/>
-		public void Trace(string? msg) => Logger?.Verbose($"[{ Plugin.PluginName }] { msg }");
+		public void Trace(string? msg) => Logger?.Verbose($"[{ Plugin.PluginName }] {msg}");
+
+        /// <inheritdoc/>
+        public T GetApplicationConfig<T>(string config) => ConfigManager.Instance.GetConfig<T>(config);
+
+        /// <inheritdoc/>
+        public bool TryGetApplicationConfig<T>(string config, out T? value) {
+            try {
+                value = GetApplicationConfig<T>(config);
+            } catch {
+                value = default;
+                return false;
+            }
+
+            return true;
+        }
     }
 }
 
