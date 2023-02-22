@@ -16,7 +16,7 @@ namespace Hermod.Core.Commands.Results {
 		object? ICommandResult.Result => throw new NotImplementedException();
 		#endregion
 
-		public JsonCommandResult() { }
+		public JsonCommandResult(): this(string.Empty, Activator.CreateInstance<T>()) { }
 
         public JsonCommandResult(string message, T result) {
             Message = message;
