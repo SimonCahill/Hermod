@@ -48,6 +48,7 @@ namespace Hermod {
 
             m_appLogger.Debug("Setting up PluginRegistry...");
             PluginRegistry.Instance.AppLogger = m_appLogger;
+            PluginRegistry.Instance.BuiltInCommands = m_commands;
 
             m_appLogger.Information("Loading plugins...");
             m_appLogger.Information($"Plugin dir: { m_configManager.GetPluginInstallDir() }");
