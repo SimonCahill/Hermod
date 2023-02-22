@@ -70,6 +70,24 @@ namespace Hermod.Core.Delegation {
         ICommandResult ExecuteCommand(params string[] command);
 
         /// <summary>
+        /// Retrieves an application configuration value.
+        /// </summary>
+        /// <typeparam name="T">The type of the config.</typeparam>
+        /// <param name="config">The config name.</param>
+        /// <returns>The desired configuration.</returns>
+        /// <exception cref="Exception" >If an error occurs.</exception>
+        T GetApplicationConfig<T>(string config);
+
+        /// <summary>
+        /// Tries to retrieve an application configuration value.
+        /// </summary>
+        /// <typeparam name="T">The type of the config.</typeparam>
+        /// <param name="config">The config name.</param>
+        /// <param name="value">The config value.</param>
+        /// <returns><code >true</code> if retrieving the configuration was successful. <code >false</code> otherwise.</returns>
+        bool TryGetApplicationConfig<T>(string config, out T value);
+
+        /// <summary>
         /// Logs an information message to the logger.
         /// </summary>
         /// <remarks >
