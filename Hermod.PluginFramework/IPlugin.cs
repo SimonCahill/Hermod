@@ -2,6 +2,7 @@
 
 namespace Hermod.PluginFramework {
 
+    using Config;
     using Core.Commands;
     using Core.Commands.Results;
 
@@ -25,7 +26,7 @@ namespace Hermod.PluginFramework {
         /// <summary>
         /// A list of all commands this plugin provides
         /// </summary>
-        ICommand[] PluginCommands { get; }
+        List<ICommand> PluginCommands { get; }
 
         /// <summary>
         /// Method that is called once the plugin has been loaded.
@@ -43,6 +44,17 @@ namespace Hermod.PluginFramework {
         /// Method that is called when Hermod is shutting down.
         /// </summary>
         void OnStop();
+
+        /// <summary>
+        /// Method that is called when an application-wide configuration has been modified.
+        /// </summary>
+        /// <param name="e">The <see cref="ConfigChangedEventArgs"/> that are generated when a config was modified.</param>
+        void OnConfigChanged(ConfigChangedEventArgs e);
+
+        /// <summary>
+        /// Method that is called when the application-wide configurations have been loaded.
+        /// </summary>
+        void OnConfigLoaded();
 
     }
 
