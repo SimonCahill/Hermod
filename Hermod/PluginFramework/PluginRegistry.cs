@@ -3,9 +3,10 @@
 namespace Hermod.PluginFramework {
 
 	using Config;
+    using Core.Attributes;
     using Core.Commands;
     using Core.Exceptions;
-	using Serilog;
+    using Serilog;
 
     using System.Reflection;
     using System.Reflection.Metadata;
@@ -115,7 +116,10 @@ namespace Hermod.PluginFramework {
             pluginTypes = new List<Type>();
 
             foreach (var type in assembly.GetTypes()) {
-                if (type.IsSubclassOf(typeof(IPlugin)) || type.IsSubclassOf(typeof(Plugin))) {
+                var isSubclass = type.IsSubclassOf(typeof(IPlugin)) || type.IsSubclassOf(typeof(Plugin));
+                var attribute = type.GetCustomAttribute<PluginAttribute>();
+
+                if (isSubclass && attribute is not null) {
                     pluginTypes.Add(type);
                 }
             }
