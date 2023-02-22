@@ -1,8 +1,11 @@
 ﻿using System;
-using Hermod.Core.Commands;
-using Serilog;
 
 namespace Hermod.PluginFramework {
+
+	using Config;
+	using Core.Commands;
+
+	using Serilog;
 
     /// <summary>
     /// An abstract class for plugins with all the main features already implemented.
@@ -18,7 +21,7 @@ namespace Hermod.PluginFramework {
 		public Plugin(string pluginName, Version pluginVersion, params ICommand[] commands) {
 			PluginVersion = pluginVersion;
 			PluginName = pluginName;
-			PluginCommands = commands;
+			PluginCommands = commands.ToList();
 		}
 
 		/// <inheritdoc/>
@@ -28,7 +31,7 @@ namespace Hermod.PluginFramework {
 		public string PluginName { get; protected set; }
 
 		/// <inheritdoc/>
-		public ICommand[] PluginCommands { get; protected set; }
+		public List<ICommand> PluginCommands { get; protected set; }
 
 		/// <inheritdoc/>
 		public abstract void OnLoad(ILogger logger);
@@ -38,6 +41,12 @@ namespace Hermod.PluginFramework {
 
 		/// <inheritdoc/>
 		public abstract void OnStop();
+
+		/// <inheritdoc/>
+		public abstract void OnConfigChanged(ConfigChangedEventArgs e);
+
+		/// <inheritdoc/>
+		public abstract void OnConfigLoaded();
 	}
 }
 
