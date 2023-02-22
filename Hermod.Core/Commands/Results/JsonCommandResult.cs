@@ -12,6 +12,8 @@ namespace Hermod.Core.Commands.Results {
 
         /// <inheritdoc/>
         public T Result { get; set; }
+
+		object? ICommandResult.Result => throw new NotImplementedException();
 		#endregion
 
 		public JsonCommandResult() { }
