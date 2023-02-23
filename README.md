@@ -5,6 +5,29 @@ A complete re-write of a previous project and a work project I started many year
 
 Hermod provides a basic framework to become whatever you need it to be.
 
+# To-Dos:
+
+Before I get started with the juicy details, let me first tell you of all the things I need (or want) to finish, first:
+
+ - The EmailImporter plugin
+   - This is the first-party plugin that will actually get all your emails from your account
+   - This is the first plugin to be developed and is currently being worked on.
+   - The next merge to the master branch will contain a (at least mostly) working version
+ - The MailProcessor plugin
+   - This is the first-party plugin that will process each individual email, strip its attachments and convert it do a
+     document format so it may be indexed.
+   - Once the mail has been processed, the document will be published to `/hermod/mail/processed` topic for further processing
+   - This will be the second plugin to be developed
+ - The ElasticIndexer plugin
+   - This first-party plugin will subscribe to the `/hermod/mail/processed` topic and index each and every email document into an Elasticsearch backend
+   - After an email was succesfully indexed, the email will be published to the `/hermod/email/indexed` topic so the archival plugin can then do its thing
+   - The ElasticIndexer plugin (as should any indexers!) will also subscribe to the `/hermod/index/request` topic and will search the index for any matching documents.
+     - The result(s) will be published to the `/hermod/index/response` topic.
+ - The FsArchiver pluign
+   - This first-party plugin will subscribe to the `/hermod/mail/indexed` and archive the file to the filesystem on the local machine.
+   - This plugin marks the end of an email's long journey through Hermod. It will finally be in Valhalla.
+   - FsArchiver (as should all archival plugins!) will also subscribe to the `/hermod/archive/request` topic and return all results on `/hermod/archive/response`
+
 # Cross platform
 
 Hermod was and is (at the time of writing) being developed on a Mac and is constantly tested in a Linux VM/container to ensure full compatibilit across all major operating systems.
