@@ -27,6 +27,8 @@ namespace Hermod.PluginFramework {
         #region IMessageReceived
         /// <inheritdoc/>
         public event MessageReceivedEventHandler? MessageReceived;
+
+        internal void OnMessageReceived(MessageReceivedEventArgs e) => MessageReceived?.Invoke(this, e);
         #endregion
 
         /// <inheritdoc/>
