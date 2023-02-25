@@ -26,6 +26,7 @@ namespace Hermod.PluginFramework {
         private PluginRegistry() {
             ConfigManager.Instance.ConfigChanged += ConfigManager_ConfigChanged;
             ConfigManager.Instance.ConfigLoaded += ConfigManager_ConfigLoaded;
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
         }
 
         private static PluginRegistry? _instance;
@@ -173,6 +174,47 @@ namespace Hermod.PluginFramework {
             foreach (var plugin in Plugins) {
                 plugin.OnConfigChanged(e);
             }
+        }
+
+        private Assembly? CurrentDomain_AssemblyResolve(object? sender, ResolveEventArgs args) {
+            AppLogger?.Warning("Failed to resolve assembly {argname}", args.Name);
+            var loadedAssembly = AppDomain.CurrentDomain.GetAssemblies()?.Where(x => x.FullName == args.RequestingAssembly?.FullName)?.FirstOrDefault();
+            if (loadedAssembly is not null) {
+                return loadedAssembly;
+            }
+
+            var folderPath = Path.GetDirectoryName(args.RequestingAssembly?.Location);
+            var asmName = new AssemblyName(args.Name);
+            if (folderPath is null || asmName.Name is null) {
+                AppLogger?.Error("Could not find assembly in {location}", folderPath);
+                return default;
+            }
+
+            var rawPath = Path.Combine(folderPath, asmName.Name);
+            var asmPath = rawPath + ".dll";
+
+            if (!File.Exists(asmPath)) {
+                AppLogger?.Warning("Could not find {asmPath}! Is it an executable?", asmPath);
+                asmPath = rawPath + ".exe";
+                if (!File.Exists(asmPath)) {
+                    AppLogger?.Warning("Could not find {asmPath}!", asmPath);
+                    return default;
+                }
+            }
+
+            return Assembly.LoadFrom(asmPath);
+        }
+
+        /// <summary>
+        /// Gets a list containing all <see cref="ICommand"/> instances known to the application at the current time.
+        /// </summary>
+        /// <returns>A list of all known commands.</returns>
+        internal List<ICommand> GetAllCommands() {
+            var list = BuiltInCommands ?? new List<ICommand>();
+
+            Plugins.ForEach(p => list.AddRange(p.PluginCommands));
+
+            return list;
         }
 
     }

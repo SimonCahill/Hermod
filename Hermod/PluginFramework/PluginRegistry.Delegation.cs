@@ -3,6 +3,7 @@
 namespace Hermod.PluginFramework {
 
     using Core.Commands.Results;
+    using Core.Delegation;
     using Core.Exceptions;
     using System.Text.RegularExpressions;
 
@@ -84,7 +85,10 @@ namespace Hermod.PluginFramework {
                 return; // this may change in the future.
             }
 
-
+            var eventArgs = new MessageReceivedEventArgs(topic, message);
+            foreach (var subscriber in TopicSubscriptions[topic]) {
+                PluginDelegators.FirstOrDefault(p => p.Plugin == subscriber)?.OnMessageReceived(eventArgs);
+            }
         }
 
         internal ICommandResult ExecuteCommand(params string[] commands) {
