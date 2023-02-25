@@ -19,8 +19,12 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="System.Data.SqlClient" />
+    <None Remove="Data\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Hermod.PluginFramework\Hermod.PluginFramework.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Data\" />
   </ItemGroup>
 </Project>
