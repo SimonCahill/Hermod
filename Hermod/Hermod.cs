@@ -8,7 +8,7 @@ namespace Hermod {
     using PluginFramework;
 
     using Serilog;
-
+    using System.Diagnostics;
     using System.Text;
 
     /// <summary>
@@ -19,6 +19,8 @@ namespace Hermod {
     public partial class Hermod {
 
         public bool InteractiveMode { get; internal set; }
+
+        private Stack<string> m_previousCommands = new Stack<string>();
 
         /// <summary>
         /// Main constructor; initialises the object.
@@ -74,7 +76,7 @@ namespace Hermod {
             while (m_keepAlive) {
 
                 if (InteractiveMode) {
-                    var promptInput = await ShowPrompt();
+                    var promptInput = ShowPrompt();
                     if (string.IsNullOrEmpty(promptInput)) { continue; }
 
                     var splitString = promptInput.Split(' ', '\t');
@@ -88,8 +90,10 @@ namespace Hermod {
 
                         var result = await command.ExecuteAsync(argArray);
 
-                        if (result is CommandErrorResult && !string.IsNullOrEmpty(result?.Message)) {
+                        if (result is CommandErrorResult errResult && !string.IsNullOrEmpty(result?.Message)) {
                             ConsoleErrorWrite(result.Message);
+
+                            m_appLogger.Error(errResult.Result as Exception, $"Command execution failed! Command: { command.Name } { string.Join(' ', argArray) }");
                         } else if (!string.IsNullOrEmpty(result?.Message)) {
                             ConsoleWrite(result.Message);
                         }
@@ -111,10 +115,105 @@ namespace Hermod {
         /// Displays the input prompt.
         /// </summary>
         /// <returns>An awaitable string?.</returns>
-        private async Task<string?> ShowPrompt() {
+        private string? ShowPrompt() {
+            const string PROMPT_STR = "hermod > ";
+
+            void WritePrompt(bool newLine = true) {
+                if (newLine) { Console.WriteLine(); }
+                Console.Write(PROMPT_STR);
+            }
+
+            WritePrompt();
+            StringBuilder lineCache = new StringBuilder();
+
+            ConsoleKeyInfo keyCode;
+            var historyStartIndex = m_previousCommands.Count;
+
+            while ((keyCode = Console.ReadKey()).Key != ConsoleKey.Enter) {
+                switch (keyCode.Key) {
+                    case ConsoleKey.Tab: {
+                        var autocompletedString = GetAutocompletion(lineCache.ToString());
+                        if (autocompletedString is null) {
+                            Console.Beep();
+                            continue;
+                        }
+
+                        Console.Write(autocompletedString);
+                        lineCache.Append(autocompletedString);
+                        break;
+                    }
+                    case ConsoleKey.Backspace:
+                        if (lineCache.Length == 0) { Console.Beep(); continue; }
+                        lineCache.Remove(lineCache.Length - 1, 1);
+
+                        // This surely isn't the best way to handle this, but apparently the terminal doesn't response correctly to \b
+                        Console.Write('\b');
+                        Console.Write(' ');
+                        Console.Write('\b');
+                        break;
+                    case ConsoleKey.UpArrow:
+                        if (m_previousCommands.Count == 0 || historyStartIndex == m_previousCommands.Count) {
+                            Console.Beep();
+                            continue;
+                        }
+
+                        lineCache.Clear();
+                        lineCache.Append(m_previousCommands.ElementAt(m_previousCommands.Count - historyStartIndex++));
+                        Console.CursorLeft = 0;
+                        WritePrompt();
+                        Console.Write(lineCache.ToString());
+                        break;
+                }
+
+                lineCache.Append(keyCode.KeyChar);
+            }
+
             Console.WriteLine();
-            Console.Write("hermod > ");
-            return await Console.In.ReadLineAsync(m_inputCancellationToken.Token);
+            var cmdString = lineCache.ToString();
+            m_previousCommands.Push(cmdString);
+            return cmdString;
+        }
+
+        /// <summary>
+        /// Attempts to get an auto completed string for the user's input.
+        /// </summary>
+        /// <param name="input">The current input in the interactive prompt.</param>
+        /// <param name="maxDistance">The max levenshtein distance for the string to match.</param>
+        /// <returns>The matched string or <code >default</code> if not matches were found.</returns>
+        private string? GetAutocompletion(string input, int maxDistance = 2) {
+            var matches =
+                from command in PluginRegistry.Instance.GetAllCommands()
+                let distance = LevenshteinDistance(command.Name, input)
+                where distance <= maxDistance
+                select command.Name;
+
+            return matches.FirstOrDefault();
+        }
+
+        private int LevenshteinDistance(string haystack, string needle) {
+            // Special cases
+            if (haystack == needle) { return 0; }
+            if (haystack.Length == 0) { return needle.Length; }
+            if (needle.Length == 0) { return haystack.Length; }
+
+            // Initialize the distance matrix
+            int[,] distance = new int[haystack.Length + 1, needle.Length + 1];
+            for (int i = 0; i <= haystack.Length; i++) {
+                distance[i, 0] = i;
+            }
+            for (int j = 0; j <= needle.Length; j++) {
+                distance[0, j] = j;
+            }
+
+            // Calculate the distance
+            for (int i = 1; i <= haystack.Length; i++) {
+                for (int j = 1; j <= needle.Length; j++) {
+                    int cost = (haystack[i - 1] == needle[j - 1]) ? 0 : 1;
+                    distance[i, j] = Math.Min(Math.Min(distance[i - 1, j] + 1, distance[i, j - 1] + 1), distance[i - 1, j - 1] + cost);
+                }
+            }
+            // Return the distance
+            return distance[haystack.Length, needle.Length];
         }
 
         /// <summary>
@@ -169,6 +268,7 @@ namespace Hermod {
             lock (m_consoleLock) {
                 var prevBackground = Console.BackgroundColor;
                 var prevForegound = Console.ForegroundColor;
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.Error.WriteLine(message);
                 Console.BackgroundColor = prevBackground;
                 Console.ForegroundColor = prevForegound;
