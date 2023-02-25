@@ -51,6 +51,21 @@ namespace Hermod.Core.Accounts {
         }
 
         /// <summary>
+        /// Copy-constructor.
+        /// </summary>
+        /// <param name="domain">The original domain to copy from</param>
+        /// <param name="includeUsers" >Whether or not to shallow copy the user list</param>
+        public Domain(Domain domain, bool includeUsers = false) {
+            Id = domain.Id;
+            Tld = domain.Tld;
+            DomainName = domain.DomainName;
+
+            if (includeUsers) {
+                DomainUsers = new List<DomainUser>(domain.DomainUsers.ConvertAll(x => x)); // shallow copy
+            }
+        }
+
+        /// <summary>
         /// The domain's ID.
         ///
         /// This is typically a number starting with zero.
@@ -73,7 +88,10 @@ namespace Hermod.Core.Accounts {
         /// </example>
         public string DomainName { get; set; }
 
-        public List<DomainUser> DomainUsers { get; }
+        /// <summary>
+        /// A list of users belonging to the domain.
+        /// </summary>
+        public List<DomainUser> DomainUsers { get; set; }
 
     }
 }
