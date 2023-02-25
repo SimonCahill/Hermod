@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{A953
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hermod.TestPlugin", "Hermod.TestPlugin\Hermod.TestPlugin.csproj", "{6E6FE737-66EA-4592-9946-4C6CB4634D7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hermod.EmailImport", "Hermod.TestPlugin\Hermod.EmailImport\Hermod.EmailImport.csproj", "{FD2AFF5C-1AD9-42E9-B6BB-A46C7D73FE12}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hermod.EmailImport", "Hermod.EmailImport\Hermod.EmailImport.csproj", "{FD2AFF5C-1AD9-42E9-B6BB-A46C7D73FE12}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E775132D-587E-42BE-AC28-981B1E66BABF}"
 	ProjectSection(SolutionItems) = preProject
