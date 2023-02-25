@@ -58,8 +58,7 @@
         "Host": "localhost",
         "DatabaseName": "hermod",
         "DatabaseUser": "hermod",
-        "DatabasePass": "hermod123" // for the love of all things good please change these!,
-        "ConnectionTimeoutInSec": 30
+        "DatabasePass": "hermod123" // for the love of all things good please change these!
     },
 
     "UseJsonFile": true,
