@@ -12,7 +12,13 @@ namespace Hermod.EmailImport.Data {
     /// <remarks >
     /// When I say database, I use it interchangeably with "table".
     /// </remarks>
-    public abstract class DatabaseConnector {
+    public abstract class DatabaseConnector: IDisposable {
+
+        protected object m_lock;
+
+        protected DatabaseConnector() {
+            m_lock = new object();
+        }
 
         /// <summary>
         /// Connect to the database.
@@ -73,6 +79,8 @@ namespace Hermod.EmailImport.Data {
         /// <returns>An awaitable <see cref="Task{Int32}"/> indicating the amount of users purged.</returns>
         public abstract Task<int> PurgeUsersFromDomain(Domain domain);
 
+        /// <inheritdoc/>
+        public abstract void Dispose();
     }
 }
 

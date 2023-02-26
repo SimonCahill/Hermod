@@ -1,0 +1,43 @@
+{
+  "Plugins": {
+    "PluginRepository": {
+      "Url": "https://hermod.simonc.eu/plugin_repository"
+    },
+    "IgnoreList": [],
+    "InstallDir": null
+  },
+  "Logging": {
+    "ConsoleLogging": {
+      "EnableLogging": true,
+      "LogLevel": "warning"
+    },
+    "FileLogging": {
+      "EnableLogging": false,
+      "LogLevel": "information",
+      "LogLocation": "sysdefault",
+      "LogFileName": "hermod.log"
+    }
+  },
+  "Terminal": {
+    "EnableInteractive": true
+  },
+  "Accounts": {
+    "EncryptData": true,
+    "EncryptionAlgo": null,
+    "EncryptionSalt": null,
+    "UseDatabase": false,
+    "DatabaseInfo": {
+      "Host": "localhost",
+      "DatabaseName": "hermod",
+      "DatabaseUser": "hermod",
+      "DatabasePass": "hermod123"
+    },
+    "UseJsonFile": true,
+    "JsonFileInfo": {
+      "FilePath": null
+    }
+  },
+  "Archival": {
+    "ArchivePath": null
+  }
+}

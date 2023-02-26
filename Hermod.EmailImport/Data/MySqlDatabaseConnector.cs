@@ -1,12 +1,10 @@
-﻿#if false
-
-using System;
+﻿using System;
 
 namespace Hermod.EmailImport {
 
     using Core.Accounts;
     using Core.Delegation;
-
+    using Hermod.EmailImport.Data;
     using System.Data;
     using System.Data.Common;
     using System.Data.SqlClient;
@@ -17,34 +15,34 @@ namespace Hermod.EmailImport {
     ///
     /// This class is (very likely) incompatible with other databases!
     /// </summary>
-    public class MySqlDatabaseConnector {
+    public class MySqlDatabaseConnector: DatabaseConnector {
 
-        const string DomainTableName                        = "Hermod_Domains"; /// The name of the Domain table
-        const string DomainUsersTableName                   = "Hermod_DomainUsers"; /// The name of the Domain User table
-        const string TldTableName                           = "Hermod_Tld"; /// The name of the TLD table
+        const string DomainTableName = "Hermod_Domains"; /// The name of the Domain table
+        const string DomainUsersTableName = "Hermod_DomainUsers"; /// The name of the Domain User table
+        const string TldTableName = "Hermod_Tld"; /// The name of the TLD table
 
-        const string TldDb_IdColumnName                     = "ID"; /// The name of the ID column for the TLD table
-        const string TldDb_TldColumnName                    = "TLD"; /// The name of the TLD column for the TLD table
+        const string TldDb_IdColumnName = "ID"; /// The name of the ID column for the TLD table
+        const string TldDb_TldColumnName = "TLD"; /// The name of the TLD column for the TLD table
 
-        const string DomainDb_IdColumnName                  = "ID"; /// The name of the ID column for the Domain table
-        const string DomainDb_TldColumnName                 = "TLD"; /// The name of the TLD ID column for the Domain table
-        const string DomainDb_DomainColumnName              = "DomainName"; /// The name of the Domain Name column for the Domain table
+        const string DomainDb_IdColumnName = "ID"; /// The name of the ID column for the Domain table
+        const string DomainDb_TldColumnName = "TLD"; /// The name of the TLD ID column for the Domain table
+        const string DomainDb_DomainColumnName = "DomainName"; /// The name of the Domain Name column for the Domain table
 
-        const string DomainUserDb_IdColumnName              = "ID";
-        const string DomainUserDb_DomainColumnName          = "Domain";
-        const string DomainUserDb_AccountColumnName         = "AccountName";
-        const string DomainUserDb_AccountPasswdColumnName   = "AccountPassword";
-        const string DomainUserDb_PasswdSaltColumnName      = "PasswordSalt";
-        const string DomainUserDb_AccountType               = "AccountType";
+        const string DomainUserDb_IdColumnName = "ID";
+        const string DomainUserDb_DomainColumnName = "Domain";
+        const string DomainUserDb_AccountColumnName = "AccountName";
+        const string DomainUserDb_AccountPasswdColumnName = "AccountPassword";
+        const string DomainUserDb_PasswdSaltColumnName = "PasswordSalt";
+        const string DomainUserDb_AccountType = "AccountType";
 
-        private bool    m_domainDbFound = false; /// indicates whether or not the domain table was found
-        private bool    m_domainUserDbFound = false; /// indicates whether or not the domain user table was found
-        private bool    m_tldDbFound = false; /// indicates whether or not the TLD table was found
+        private bool m_domainDbFound = false; /// indicates whether or not the domain table was found
+        private bool m_domainUserDbFound = false; /// indicates whether or not the domain user table was found
+        private bool m_tldDbFound = false; /// indicates whether or not the TLD table was found
 
-        private string  m_dbHost; /// The database host.
-        private string  m_dbUser; /// The database user.
-        private string  m_dbPass; /// The database password.
-        private string  m_dbName; /// The database name.
+        private string m_dbHost; /// The database host.
+        private string m_dbUser; /// The database user.
+        private string m_dbPass; /// The database password.
+        private string m_dbName; /// The database name.
 
         private SqlConnection? m_dbConnection;
 
@@ -61,8 +59,8 @@ namespace Hermod.EmailImport {
             m_pluginDelegator = pluginDelegator;
         }
 
-        ~MySqlDatabaseConnector() {
-            using var _ = m_dbConnection;
+        public override void Dispose() {
+            m_dbConnection?.Dispose();
         }
 
         private void M_dbConnection_StateChange(object sender, System.Data.StateChangeEventArgs e) {
@@ -75,7 +73,7 @@ namespace Hermod.EmailImport {
         /// <summary>
         /// Synchronously connects to the database.
         /// </summary>
-        protected void Connect() {
+        public override void Connect() {
             if (
                 m_dbConnection is not null &&
                 (
@@ -102,7 +100,7 @@ namespace Hermod.EmailImport {
         /// Asynchronously connects to the database.
         /// </summary>
         /// <returns></returns>
-        internal async Task ConnectAsync() {
+        public override async Task ConnectAsync() {
             if (
                 m_dbConnection is not null &&
                 (
@@ -130,7 +128,7 @@ namespace Hermod.EmailImport {
         /// </summary>
         /// <returns>An awaitable <see cref="Task"/> with the return value; <code >true</code> if everything is initialised. <code >false</code> otherwise.</returns>
         /// <exception cref="Exception">If an error occurs.</exception>
-        protected async Task<bool> IsInitialisedAsync() {
+        public override async Task<bool> IsInitialisedAsync() {
             if (m_dbConnection is null) {
                 throw new Exception("Database not initialised!");
             }
@@ -173,9 +171,7 @@ namespace Hermod.EmailImport {
         /// Asynchronously initialises the database and any required tables.
         /// </summary>
         /// <returns>An awaitable <see cref="Task"/>.</returns>
-        internal async Task InitialiseDatabaseAsync() {
-            await CreateTablesAsync();
-        }
+        public override async Task InitialiseDatabaseAsync() => await CreateTablesAsync();
 
         /// <summary>
         /// Asynchronously creates all required tables.
@@ -192,9 +188,9 @@ namespace Hermod.EmailImport {
             if (!m_tldDbFound) {
                 sBuilder.AppendLine(
                     $"""
-                    CREATE TABLE { TldTableName } (
-                        { TldDb_IdColumnName  } int not null primary key auto_increment,
-                        { TldDb_TldColumnName } varchar(30) not null
+                    CREATE TABLE {TldTableName} (
+                        {TldDb_IdColumnName} int not null primary key auto_increment,
+                        {TldDb_TldColumnName} varchar(30) not null
                     );
                     """
                 );
@@ -203,11 +199,11 @@ namespace Hermod.EmailImport {
             if (!m_domainDbFound) {
                 sBuilder.AppendLine(
                     $"""
-                    CREATE TABLE { DomainTableName } (
-                        {   DomainDb_IdColumnName   } int not null primary key auto_increment,
-                        {   DomainDb_TldColumnName  } int not null,
-                        { DomainDb_DomainColumnName } varchar(255) not null,
-                        foreign key ({ DomainDb_TldColumnName }) references { TldTableName }({ TldDb_IdColumnName })
+                    CREATE TABLE {DomainTableName} (
+                        {DomainDb_IdColumnName} int not null primary key auto_increment,
+                        {DomainDb_TldColumnName} int not null,
+                        {DomainDb_DomainColumnName} varchar(255) not null,
+                        foreign key ({DomainDb_TldColumnName}) references {TldTableName}({TldDb_IdColumnName})
                     );
                     """
                 );
@@ -216,14 +212,14 @@ namespace Hermod.EmailImport {
             if (!m_domainUserDbFound) {
                 sBuilder.AppendLine(
                     $"""
-                    CREATE TABLE { DomainUsersTableName } (
-                        {        DomainUserDb_IdColumnName     } int not null primary key auto_increment,
-                        {     DomainUserDb_DomainColumnName    } int not null,
-                        {    DomainUserDb_AccountColumnName    } varchar(255) not null,
-                        { DomainUserDb_AccountPasswdColumnName } varchar(2048) not null,
-                        {   DomainUserDb_PasswdSaltColumnName  } varchar(4096) not null,
-                        {       DomainUserDb_AccountType       } varchar(50) not null,
-                        foreign key ({ DomainUserDb_DomainColumnName }) references {DomainTableName}({DomainDb_IdColumnName})
+                    CREATE TABLE {DomainUsersTableName} (
+                        {DomainUserDb_IdColumnName} int not null primary key auto_increment,
+                        {DomainUserDb_DomainColumnName} int not null,
+                        {DomainUserDb_AccountColumnName} varchar(255) not null,
+                        {DomainUserDb_AccountPasswdColumnName} varchar(2048) not null,
+                        {DomainUserDb_PasswdSaltColumnName} varchar(4096) not null,
+                        {DomainUserDb_AccountType} varchar(50) not null,
+                        foreign key ({DomainUserDb_DomainColumnName}) references {DomainTableName}({DomainDb_IdColumnName})
                     );
                     """
                 );
@@ -244,7 +240,7 @@ namespace Hermod.EmailImport {
         /// <param name="tlds">An optional list of TLDs; if set, only domains within these TLDs will be returned.</param>
         /// <returns>A list of known domains.</returns>
         /// <exception cref="Exception">If an error occurs.</exception>
-        internal async Task<List<Domain>> GetDomainsAsync(bool includeUsers = true, params string[] tlds) {
+        public override async Task<List<Domain>> GetDomainsAsync(bool includeUsers = true, params string[] tlds) {
             if (m_dbConnection is null || m_dbConnection?.State == ConnectionState.Broken || m_dbConnection?.State == ConnectionState.Closed) {
                 await ConnectAsync();
             }
@@ -260,10 +256,10 @@ namespace Hermod.EmailImport {
             $"""
             SELECT *,
             	(
-                    SELECT { TldTableName }.{ TldDb_TldColumnName } FROM { TldTableName }
-                    WHERE { TldTableName }.{ TldDb_IdColumnName } = { DomainTableName }.{ DomainDb_TldColumnName }
-                ) As { tldName }
-            FROM { DomainTableName };
+                    SELECT {TldTableName}.{TldDb_TldColumnName} FROM {TldTableName}
+                    WHERE {TldTableName}.{TldDb_IdColumnName} = {DomainTableName}.{DomainDb_TldColumnName}
+                ) As {tldName}
+            FROM {DomainTableName};
             """;
 
             using var result = await sqlCommand.ExecuteReaderAsync();
@@ -286,7 +282,7 @@ namespace Hermod.EmailImport {
             // this can and should be optimised in future so the SqlCommand does the filtering for us.
             // but I'm not good at SQL :)
             // - Simon
-            return domains.Where(x => tlds.Contains($"{ x.Tld }")).ToList();
+            return domains.Where(x => tlds.Contains($"{x.Tld}")).ToList();
         }
 
         /// <summary>
@@ -295,7 +291,7 @@ namespace Hermod.EmailImport {
         /// <param name="domain">The <see cref="Domain"/> for which to retrieve all users.</param>
         /// <returns>An awaitable task.</returns>
         /// <exception cref="Exception">If an error occurs.</exception>
-        internal async Task GetUsersForDomainAsync(Domain domain, bool clearExisting = true) {
+        public async Task GetUsersForDomainAsync(Domain domain, bool clearExisting = true) {
             if (m_dbConnection is null || m_dbConnection?.State == ConnectionState.Broken || m_dbConnection?.State == ConnectionState.Closed) {
                 await ConnectAsync();
             }
@@ -308,8 +304,8 @@ namespace Hermod.EmailImport {
             sqlCommand.CommandText =
             $"""
             SELECT *
-            FROM { DomainUsersTableName }
-            WHERE Domain = { domain.Id }
+            FROM {DomainUsersTableName}
+            WHERE Domain = {domain.Id}
             """;
 
             using var result = await sqlCommand.ExecuteReaderAsync();
@@ -326,7 +322,19 @@ namespace Hermod.EmailImport {
                 domain.DomainUsers.Add(user);
             }
         }
+
+        public override Task GetUsersForDomainAsync(Domain domain) => GetUsersForDomainAsync(domain);
+
+        public override Task<int> PurgeDatabases() {
+            throw new NotImplementedException();
+        }
+
+        public override Task<bool> RemoveUserFromDomain(Domain domain, DomainUser user) {
+            throw new NotImplementedException();
+        }
+
+        public override Task<int> PurgeUsersFromDomain(Domain domain) {
+            throw new NotImplementedException();
+        }
     }
 }
-
-#endif

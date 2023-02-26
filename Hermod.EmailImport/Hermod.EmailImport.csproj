@@ -18,13 +18,16 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="System.Data.SqlClient" />
-    <None Remove="Data\" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Hermod.PluginFramework\Hermod.PluginFramework.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\" />
+    <Folder Include="Exceptions\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Exceptions\" />
   </ItemGroup>
 </Project>

@@ -48,24 +48,28 @@
     "EnableInteractive": true, // enables interactive mode on the console
   },
 
-  "Accounts": {
-    "EncryptData": true,
-    "EncryptionAlgo": null, // leave this to null to automatically set a default - will be filled out by Hermod!
-    "EncryptionSalt": null, // leave this to null to automatically generate a good default - will be filled out by Hermod!
+    "Accounts": {
+        "EncryptData": true,
+        "EncryptionAlgo": null, // will be filled out by Hermod!
+        "EncryptionSalt": null, // will be filled out by Hermod!
+        "EncryptionKey": null, // will be filled out by Hermod!
+        "EncryptionInitVec": null, // will be filled out by Hermod!
 
-    "UseDatabase": false,
-    "DatabaseInfo": {
-        "Host": "localhost",
-        "DatabaseName": "hermod",
-        "DatabaseUser": "hermod",
-        "DatabasePass": "hermod123" // for the love of all things good please change these!
+        "UseDatabase": false,
+        "DatabaseInfo": {
+            "Host": "localhost",
+            "DatabaseName": "hermod",
+            "DatabaseUser": "hermod",
+            "DatabasePass": "hermod123" // for the love of all things good please change these!
+        },
+
+        "UseJsonFile": true,
+        "JsonFileInfo": {
+            "FilePath": null // leave this to null to use the default location
+        },
+
+        "ImportIntervalInMs": 3600
     },
-
-    "UseJsonFile": true,
-    "JsonFileInfo": {
-      "FilePath": null // leave this to null to use the default location
-    }
-  },
 
   "Archival": {
     "ArchivePath": null // setting this to null will cause Hermod to place the archive in the user directory
