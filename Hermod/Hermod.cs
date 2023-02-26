@@ -40,13 +40,6 @@ namespace Hermod {
             SetTerminalTitle();
             m_appLogger.Information("Setting up OS event handlers...");
 			Console.CancelKeyPress += Console_CancelKeyPress;
-            try {
-                Console.BufferHeight = 100;
-                Console.BufferWidth = 120;
-            } catch (PlatformNotSupportedException ex) {
-                m_appLogger.Error("Failed to set terminal size!");
-                m_appLogger.Error($"Error: { ex.Message }");
-            }
 
             m_appLogger.Debug("Setting up PluginRegistry...");
             PluginRegistry.Instance.AppLogger = m_appLogger;
