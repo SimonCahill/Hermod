@@ -18,20 +18,16 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Gnu.Getopt" />
-    <None Remove="getopt.net_cp" />
     <None Remove="Serilog.Sinks.File" />
     <None Remove="Serilog.Sinks.Console" />
     <None Remove="Serilog.Sinks.Debug" />
     <None Remove="Serilog.Sinks.RollingFile" />
     <None Remove="Newtonsoft.Json" />
-    <None Remove="getopt.net-bsd" />
     <None Remove="PluginFramework\" />
     <None Remove="System.Reflection.Metadata" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageReference Include="getopt.net-bsd" Version="0.2.0" />
     <PackageReference Include="System.Reflection.Metadata" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
