@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if false
+
+using System;
 
 namespace Hermod.EmailImport {
 
@@ -338,3 +340,5 @@ namespace Hermod.EmailImport {
         }
     }
 }
+
+#endif // false
