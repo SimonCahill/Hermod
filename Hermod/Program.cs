@@ -45,6 +45,8 @@ namespace Hermod {
 
             InitialiseLogger();
 
+            _cfgManager.AppLogger = _appLogger;
+
             var app = new Hermod(_cfgManager, _appLogger ?? Log.Logger) {
                 InteractiveMode = _interactiveMode,
                 m_keepAlive = true
