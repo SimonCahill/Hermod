@@ -21,13 +21,13 @@ namespace Hermod {
 
         private static string _shortOpts = "c:L:hv%Ui"; // the options used for this application
         private static Option[] _longOpts = new[] {
-            new Option { Name = "config",           ArgumentType = ArgumentType.Required,   Flag = IntPtr.Zero, Value = 'c' },
-            new Option { Name = "log-lvl",          ArgumentType = ArgumentType.Required,   Flag = IntPtr.Zero, Value = 'L' },
-            new Option { Name = "help",             ArgumentType = ArgumentType.None,       Flag = IntPtr.Zero, Value = 'h' },
-            new Option { Name = "version",          ArgumentType = ArgumentType.None,       Flag = IntPtr.Zero, Value = 'v' },
-            new Option { Name = "check-updates",    ArgumentType = ArgumentType.None,       Flag = IntPtr.Zero, Value = 'U' },
-            new Option { Name = "reset-cfg",        ArgumentType = ArgumentType.Optional,   Flag = IntPtr.Zero, Value = '%' },
-            new Option { Name = "interactive",      ArgumentType = ArgumentType.None,       Flag = IntPtr.Zero, Value = 'i' }
+            new Option { Name = "config",           ArgumentType = ArgumentType.Required,  Value = 'c' },
+            new Option { Name = "log-lvl",          ArgumentType = ArgumentType.Required,  Value = 'L' },
+            new Option { Name = "help",             ArgumentType = ArgumentType.None,      Value = 'h' },
+            new Option { Name = "version",          ArgumentType = ArgumentType.None,      Value = 'v' },
+            new Option { Name = "check-updates",    ArgumentType = ArgumentType.None,      Value = 'U' },
+            new Option { Name = "reset-cfg",        ArgumentType = ArgumentType.Optional,  Value = '%' },
+            new Option { Name = "interactive",      ArgumentType = ArgumentType.None,      Value = 'i' }
             // add more as required
         };
 
