@@ -1,5 +1,9 @@
 # Hermod - An open-source, GDPR-compliant e-mail archival system for Windows, Linux and macOS
 
+![hermod](img/hermod_icon.png)
+![Build Workflow](https://github.com/SimonCahill/Hermod/actions/workflows/build.yaml/badge.svg)
+![Test Workflow](https://github.com/SimonCahill/Hermod/actions/workflows/run-tests.yaml/badge.svg)
+
 Hermod, from the Norse god of communication, is an open-source, modular and (with first-party plugins) fully GDPR-compliant email archival system.
 A complete re-write of a previous project and a work project I started many years ago (which they apparently still use!), Hermod is what I always envisioned it to become.
 
