@@ -3,6 +3,7 @@
 namespace Hermod.EmailImport.Data {
 
     using Core.Accounts;
+    using Core.Exceptions;
 
     using Newtonsoft.Json;
 
@@ -25,9 +26,11 @@ namespace Hermod.EmailImport.Data {
         public JsonDatabaseConnector(FileInfo jsonFile, byte[] key, byte[] initVector) {
             if (jsonFile is null) {
                 throw new ArgumentNullException(nameof(jsonFile));
-            } if (key is null || key.Length == 0) {
+            }
+            if (key is null || key.Length == 0) {
                 throw new ArgumentNullException(nameof(key));
-            } if (initVector is null || initVector.Length == 0) {
+            }
+            if (initVector is null || initVector.Length == 0) {
                 throw new ArgumentNullException(nameof(initVector));
             }
 
@@ -172,7 +175,27 @@ namespace Hermod.EmailImport.Data {
 
         /// <inheritdoc/>
         public override async Task<Domain> AddDomainAsync(string domainName) {
+            string? tld;
+            string? domain;
+            await Domain.DownloadCurrentValidTldListFromIanaAsync();
 
+            if (!Domain.IsValidDomain(domainName, out _, out tld, out domain)) {
+                if (tld is null || domain is null) {
+                    throw new InvalidDomainNameException(domainName, "Encountered malformed domain name!");
+                }
+            } else if (tld is null || domain is null) {
+                throw new Exception("An unknown exception has occurred!"); // this should never happen
+            }
+
+            var newDomain = new Domain(m_jsonObj.DomainList.Count + 1, tld, domainName);
+            m_jsonObj.DomainList.Add(newDomain);
+            await DumpJsonAsync();
+
+            return newDomain;
+        }
+
+        public override Task<bool> RemoveDomainAsync(Domain domain) {
+            throw new NotImplementedException();
         }
     }
 }
