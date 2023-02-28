@@ -140,7 +140,7 @@ namespace Hermod.EmailImport.Data {
         /// <remarks >
         /// This will dump the newest version to disk.
         /// </remarks>
-        public override async Task<int> PurgeDatabases() {
+        public override async Task<int> PurgeDatabasesAsync() {
             var domainCount = m_jsonObj.DomainList.Count;
             m_jsonObj = new DomainContainer();
             await DumpJsonAsync();
@@ -152,7 +152,7 @@ namespace Hermod.EmailImport.Data {
         /// <remarks >
         /// This will dump the newest version to disk.
         /// </remarks>
-        public override async Task<int> PurgeUsersFromDomain(Domain domain) {
+        public override async Task<int> PurgeUsersFromDomainAsync(Domain domain) {
             var domainToPurge = m_jsonObj.DomainList.First(d => d.Tld == domain.Tld && d.DomainName == domain.DomainName);
             var domainUsers = domainToPurge.DomainUsers.Count;
             domainToPurge.DomainUsers = new List<DomainUser>();
@@ -162,12 +162,17 @@ namespace Hermod.EmailImport.Data {
         }
 
         /// <inheritdoc/>
-        public override async Task<bool> RemoveUserFromDomain(Domain domain, DomainUser user) {
+        public override async Task<bool> RemoveUserFromDomainAsync(Domain domain, DomainUser user) {
             var domainToEdit = m_jsonObj.DomainList.First(d => d.Tld == domain.Tld && d.DomainName == domain.DomainName);
             domainToEdit.DomainUsers.Remove(user);
             await DumpJsonAsync();
 
             return true;
+        }
+
+        /// <inheritdoc/>
+        public override async Task<Domain> AddDomainAsync(string domainName) {
+
         }
     }
 }
