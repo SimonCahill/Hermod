@@ -65,7 +65,7 @@ namespace Hermod {
                 "\tunload-plugin <plugin-name [<plugin-name>]> # unload multiple plugins\n" +
                 "\tunload-plugin --all, -a # unload all plugins",
                 HandleUnloadPlugin,
-                new getopt.net.Option { Name = "all", ArgumentType = getopt.net.ArgumentType.None, Flag = IntPtr.Zero, Value = 'a' }
+                new getopt.net.Option { Name = "all", ArgumentType = getopt.net.ArgumentType.None, Value = 'a' }
             )
         };
 
