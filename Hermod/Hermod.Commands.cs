@@ -70,6 +70,8 @@ namespace Hermod {
         };
 
         private ICommandResult HandleDisplayHelp(params string[] args) {
+            if (args.Length > 0) { return HandleDisplayCommandHelp(args.First()); }
+
             var sBuilder = new StringBuilder();
 
             void DumpCommandShortHelp(ICommand command) {
@@ -93,6 +95,17 @@ namespace Hermod {
             }
 
             return new CommandResult(sBuilder.ToString(), null);
+        }
+
+        private ICommandResult HandleDisplayCommandHelp(string arg) {
+            var command =
+                PluginRegistry.Instance.GetAllCommands()
+                                       .FirstOrDefault(c => c.Name.Equals(arg, StringComparison.InvariantCulture));
+            if (command is null) {
+                return new CommandErrorResult($"Command \"{ arg }\" doesn't exist!");
+            }
+
+            return new CommandResult(command.LongDescription, null);
         }
 
         private ICommandResult HandleLoadPlugin(params string[] args) {
