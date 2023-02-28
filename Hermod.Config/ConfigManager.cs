@@ -8,10 +8,11 @@ namespace Hermod.Config {
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
+    using Serilog;
+
     using System.IO;
     using System.Text;
     using System.Text.RegularExpressions;
-    using System.Xml.Linq;
 
     /// <summary>
     /// Provides an application-wide, thread safe way of getting and setting configurations relevant to the main portions of the application.
@@ -45,6 +46,12 @@ namespace Hermod.Config {
 
         private readonly object m_lock;
         private volatile string m_lockedBy;
+
+        /// <summary>
+        /// Gets or sets the logger instance.
+        /// </summary>
+        /// <value>The new <see cref="ILogger" /> instance.</value>
+        public ILogger? AppLogger { get; set; }
 
         #region IConfigLoaded
         public event ConfigLoadedEventHandler? ConfigLoaded;
@@ -231,7 +238,16 @@ namespace Hermod.Config {
         /// </remarks>
         /// <returns>An awaitable task.</returns>
         public async Task SaveConfigAsync() {
-            ConfigFile.Create().Close();
+            if (!ConfigFile.Exists) {
+                try {
+                    ConfigFile.Directory?.Create();
+                } catch (UnauthorizedAccessException ex) {
+                    HandleUnauthorizedAccessWhenSavingConfig(ex);
+                    await SaveConfigAsync();
+                }
+                ConfigFile.Create().Close();
+            }
+            
             using (var cfgFile = ConfigFile.Open(FileMode.Truncate))
             using (var sWriter = new StreamWriter(cfgFile)) {
                 string serialisedData;
@@ -244,6 +260,13 @@ namespace Hermod.Config {
             }
         }
 
+        private void HandleUnauthorizedAccessWhenSavingConfig(UnauthorizedAccessException ex) {
+            AppLogger?.Error($"Failed to create config file in { ConfigFile.FullName }!");
+            AppLogger?.Error(ex, "Hermod does not have sufficient access rights.");
+            AppLogger?.Warning("Switching to user-local config location!");
+            ConfigFile = AppInfo.GetLocalHermodDirectory().CreateSubdirectory(AppInfo.HermodAppCfgDirName).GetSubFile(DefaultConfigFileName);
+        }
+
         /// <summary>
         /// Synchronously saves the current configuration to disk.
         /// </summary>
@@ -251,7 +274,16 @@ namespace Hermod.Config {
         /// Note: saving configs here WILL remove all comments from the file!
         /// </remarks>
         public void SaveConfig() {
-            ConfigFile.Create().Close();
+            if (!ConfigFile.Exists) {
+                try {
+                    ConfigFile.Directory?.Create();
+                } catch (UnauthorizedAccessException ex) {
+                    HandleUnauthorizedAccessWhenSavingConfig(ex);
+                    SaveConfig();
+                }
+                ConfigFile.Create().Close();
+            }
+
             using (var cfgFile = ConfigFile.Open(FileMode.Truncate))
             using (var sWriter = new StreamWriter(cfgFile)) {
                 string serialisedData;
