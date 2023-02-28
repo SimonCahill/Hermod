@@ -1,4 +1,4 @@
-name: Build getopt.net
+name: Build Hermod
 
 on: [push]
 
