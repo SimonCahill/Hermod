@@ -160,7 +160,27 @@ namespace Hermod.PluginFramework {
             } catch (Exception ex) {
                 AppLogger?.Error("Failed to load plugin from assembly!");
                 AppLogger?.Error($"Error: { ex.Message }");
+
+                AppLogger?.Warning("Deregisterung plugin...");
+                DeregisterPlugin(assembly, type);
+
                 throw;
+            }
+        }
+
+        internal void DeregisterPlugin(Assembly assembly, Type type) {
+            if (LoadedAssemblies is null || LoadedAssemblies?.Count == 0) { return; }
+
+            var pluginAssembly = LoadedAssemblies?.FirstOrDefault(a => a.Key == assembly);
+            if (pluginAssembly is null) { return; }
+
+            pluginAssembly?.Value.Remove(type);
+            try {
+                PluginDelegators?.Remove(PluginDelegators.First(pd => pd.Plugin?.GetType() == type));
+            } catch { /* if an exception occurs, no PluginDelegator instance was loaded. */ }
+
+            if (pluginAssembly?.Value.Count == 0) {
+                LoadedAssemblies?.Remove(assembly);
             }
         }
 
