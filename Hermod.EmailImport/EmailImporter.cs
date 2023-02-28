@@ -107,14 +107,15 @@ namespace Hermod.EmailImport {
             m_pluginDelegator = pluginDelegator;
 
             if (m_pluginDelegator.GetApplicationConfig<bool>("Accounts.UseDatabase")) {
-                dynamic dbInfo = m_pluginDelegator.GetApplicationConfig<object>("Accounts.DatabaseInfo");
-                m_dbConnector = new MySqlDatabaseConnector(
-                    dbInfo.Host,
-                    dbInfo.DatabaseUser,
-                    dbInfo.DatabasePass,
-                    dbInfo.DatabaseName,
-                    pluginDelegator
-                );
+                // dynamic dbInfo = m_pluginDelegator.GetApplicationConfig<object>("Accounts.DatabaseInfo");
+                // m_dbConnector = new MySqlDatabaseConnector(
+                //     dbInfo.Host,
+                //     dbInfo.DatabaseUser,
+                //     dbInfo.DatabasePass,
+                //     dbInfo.DatabaseName,
+                //     pluginDelegator
+                // );
+                throw new Exception("MySqlDatabaseConnector is not usable in this version!");
             } else if (m_pluginDelegator.GetApplicationConfig<bool>("Accounts.UseJsonFile")) {
                 var filePath = m_pluginDelegator.GetApplicationConfig<string?>("Accounts.JsonFileInfo.FilePath");
                 if (filePath is null) {
@@ -124,7 +125,7 @@ namespace Hermod.EmailImport {
                 byte[] encKey = null;
                 byte[] initVec = null;
 
-                void GetEncryptionData(byte[] encKey, byte[] initVec) {
+                void GetEncryptionData(ref byte[] encKey, ref byte[] initVec) {
                     var tmpKey = m_pluginDelegator?.GetApplicationConfig<string?>("Accounts.EncryptionKey");
                     if (string.IsNullOrEmpty(tmpKey)) {
                         m_pluginDelegator?.Information("Found invalid encryption keys! Generating new encryption data...");
@@ -143,7 +144,7 @@ namespace Hermod.EmailImport {
                     Base64.DecodeFromUtf8(Encoding.UTF8.GetBytes(tmpKey), initVec, out _, out _);
                 }
 
-                GetEncryptionData(encKey, initVec);
+                GetEncryptionData(ref encKey, ref initVec);
                 m_dbConnector = new JsonDatabaseConnector(
                     new FileInfo(filePath),
                     encKey, initVec
