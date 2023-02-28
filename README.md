@@ -1,9 +1,17 @@
 # Hermod - An open-source, GDPR-compliant e-mail archival system for Windows, Linux and macOS
 
+![hermod](img/hermod_icon.png)
+
 Hermod, from the Norse god of communication, is an open-source, modular and (with first-party plugins) fully GDPR-compliant email archival system.
 A complete re-write of a previous project and a work project I started many years ago (which they apparently still use!), Hermod is what I always envisioned it to become.
 
 Hermod provides a basic framework to become whatever you need it to be.
+
+Hermod's current icon contains images from:
+ - [Wishforge](www.wishforge.com)
+ - [Artyom Khamitov](https://www.iconfinder.com/Kh.Artyom)
+My artistic skills aren't great, but it's an icon!
+The aforementioned creators have created fantastic icon packs!
 
 # To-Dos:
 
