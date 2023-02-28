@@ -19,7 +19,9 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Hermod.PluginFramework\Hermod.PluginFramework.csproj" />
+    <ProjectReference Include="..\Hermod.PluginFramework\Hermod.PluginFramework.csproj">
+      <Private>False</Private>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\" />
