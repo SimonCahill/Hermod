@@ -120,7 +120,7 @@ namespace Hermod {
             StringBuilder lineCache = new StringBuilder();
 
             ConsoleKeyInfo keyCode;
-            var historyStartIndex = m_previousCommands.Count;
+            var historyStartIndex = 0;
 
             while ((keyCode = Console.ReadKey()).Key != ConsoleKey.Enter) {
                 switch (keyCode.Key) {
@@ -154,7 +154,9 @@ namespace Hermod {
                         }
 
                         lineCache.Clear();
-                        lineCache.Append(m_previousCommands.ElementAt(m_previousCommands.Count - historyStartIndex++));
+                        var cmdIndex = m_previousCommands.Count - historyStartIndex - 1;
+                        lineCache.Append(m_previousCommands.ElementAt(cmdIndex));
+                        historyStartIndex++;
                         Console.CursorLeft = 0;
                         WritePrompt();
                         Console.Write(lineCache.ToString());
