@@ -2,6 +2,8 @@
 
 namespace Hermod.Core.Accounts {
 
+    using System.Security.Cryptography;
+
     /// <summary>
     /// This class represents a single user (email account) in a domain.
     ///
@@ -11,6 +13,11 @@ namespace Hermod.Core.Accounts {
     public sealed class DomainUser {
 
         /// <summary>
+        /// The required salt size.
+        /// </summary>
+        public const int SaltSize = 4096;
+
+        /// <summary>
         /// Creates a new instance of this object.
         /// </summary>
         /// <param name="id">The user's ID. Leave to -1 if a new account is being created.</param>
@@ -18,11 +25,16 @@ namespace Hermod.Core.Accounts {
         /// <param name="encryptedPassword">The encrypted account password.</param>
         /// <param name="passwordSalt">The password salt.</param>
         /// <param name="accType">The account type.</param>
-        public DomainUser(int id, string accountName, string encryptedPassword, string passwordSalt, AccountType accType = AccountType.Imap) {
+        public DomainUser(int id, string accountName, byte[] encryptedPassword, byte[] passwordSalt, AccountType accType = AccountType.Imap) {
+            if (passwordSalt is null || passwordSalt.Length != SaltSize || passwordSalt.All(b => b == 0) || passwordSalt.All(b => b == passwordSalt[0])) {
+                throw new ArgumentException($"Password salt must be { SaltSize }b and must contain random bytes!", nameof(passwordSalt));
+            }
+
             Id = id;
             AccountName = accountName;
             EncryptedPassword = encryptedPassword;
             AccountType = accType;
+
             PasswordSalt = passwordSalt;
         }
 
@@ -43,7 +55,7 @@ namespace Hermod.Core.Accounts {
         /// The encrypted user password.
         /// Hermod does not and will never support using unencrypted passwords!
         /// </summary>
-        public string EncryptedPassword { get; set; }
+        public byte[] EncryptedPassword { get; set; }
 
         /// <summary>
         /// The <see cref="AccountType"/> this account is configured for use with.
@@ -53,7 +65,24 @@ namespace Hermod.Core.Accounts {
         /// <summary>
         /// Gets or sets the salt to use for password encryption.
         /// </summary>
-        public string PasswordSalt { get; set; }
+        public byte[] PasswordSalt { get; set; }
+
+        /// <summary>
+        /// Generates <see cref="SaltSize"/> cryptographically random bytes and stores them in <paramref name="container"/>.
+        /// </summary>
+        /// <param name="container">A reference to the container to store the bytes in.</param>
+        public static void GenerateEntropy(ref byte[] container) {
+
+            using var rng = RandomNumberGenerator.Create();
+
+            if (container is null) {
+                container = new byte[SaltSize];
+            } else {
+                Array.Resize(ref container, SaltSize);
+            }
+
+            rng.GetBytes(container, 0, SaltSize);
+        }
 
     }
 }
