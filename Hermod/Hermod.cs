@@ -136,14 +136,17 @@ namespace Hermod {
                         break;
                     }
                     case ConsoleKey.Backspace:
-                        if (lineCache.Length == 0) { Console.Beep(); continue; }
-                        lineCache.Remove(lineCache.Length - 1, 1);
+                        if (lineCache.Length == 0) {
+                            Debug.WriteLine("Cannot delete any more characters!");
+                            continue;
+                        }
+                        lineCache = lineCache.Remove(lineCache.Length - 1, 1);
 
                         // This surely isn't the best way to handle this, but apparently the terminal doesn't response correctly to \b
                         Console.Write('\b');
                         Console.Write(' ');
                         Console.Write('\b');
-                        break;
+                        continue;
                     case ConsoleKey.UpArrow:
                         if (m_previousCommands.Count == 0 || historyStartIndex == m_previousCommands.Count) {
                             Console.Beep();
@@ -155,7 +158,7 @@ namespace Hermod {
                         Console.CursorLeft = 0;
                         WritePrompt();
                         Console.Write(lineCache.ToString());
-                        break;
+                        continue;
                 }
 
                 lineCache.Append(keyCode.KeyChar);
