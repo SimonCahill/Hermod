@@ -3,6 +3,7 @@
 namespace Hermod.Core.Accounts {
 
     using Exceptions;
+    using Newtonsoft.Json;
     using Serilog.Events;
     using System.Net;
     using System.Text.RegularExpressions;
@@ -29,6 +30,17 @@ namespace Hermod.Core.Accounts {
         public static partial Regex DomainRegex();
 
         public static List<string> ValidTlds { get; } = new List<string>();
+
+        /// <summary>
+        /// Added default constructor for JSON.
+        /// </summary>
+        [JsonConstructor]
+        public Domain() {
+            Id = -1;
+            Tld = string.Empty;
+            DomainName = string.Empty;
+            DomainUsers = new List<DomainUser>();
+        }
 
         /// <summary>
         /// Creates a new instance of this class.
@@ -129,6 +141,11 @@ namespace Hermod.Core.Accounts {
 
         public static bool operator ==(Domain? a, object? b) => a?.Equals(b) == true;
         public static bool operator !=(Domain? a, object? b) => a?.Equals(b) == false;
+
+        /// <inheritdoc/>
+        public override int GetHashCode() {
+            return base.GetHashCode();
+        }
 
         /// <summary>
         /// Gets a value indicating whether or not a given domain is valid.
