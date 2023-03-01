@@ -94,15 +94,24 @@ namespace Hermod.EmailImport.Data {
         }
 
         internal void DumpJson() {
-            using var fStream = JsonFile.Create();
-            using var sWriter = new StreamWriter(fStream);
-            sWriter.Write(EncryptString(JsonConvert.SerializeObject(m_jsonObj, Formatting.Indented)));
+            if (!JsonFile.Exists) {
+                JsonFile.Directory?.Create();
+                JsonFile.Create().Close();
+            }
+
+            using var fStream = JsonFile.Open(FileMode.Truncate);
+            fStream.Write(EncryptString(JsonConvert.SerializeObject(m_jsonObj, Formatting.Indented)));
         }
 
         internal async Task DumpJsonAsync() {
-            using var fStream = JsonFile.Create();
-            using var sWriter = new StreamWriter(fStream);
-            sWriter.Write(await EncryptStringAsync(JsonConvert.SerializeObject(m_jsonObj, Formatting.Indented)));
+            if (!JsonFile.Exists) {
+                JsonFile.Directory?.Create();
+                JsonFile.Create().Close();
+            }
+
+            using var fStream = JsonFile.Open(FileMode.Truncate);
+            var encryptedData = await EncryptStringAsync(JsonConvert.SerializeObject(m_jsonObj, Formatting.Indented));
+            await fStream.WriteAsync(encryptedData);
         }
 
         /// <inheritdoc/>
@@ -177,7 +186,6 @@ namespace Hermod.EmailImport.Data {
         public override async Task<Domain> AddDomainAsync(string domainName) {
             string? tld;
             string? domain;
-            await Domain.DownloadCurrentValidTldListFromIanaAsync();
 
             if (!Domain.IsValidDomain(domainName, out _, out tld, out domain)) {
                 if (tld is null || domain is null) {
@@ -187,6 +195,10 @@ namespace Hermod.EmailImport.Data {
                 throw new Exception("An unknown exception has occurred!"); // this should never happen
             }
 
+            if (m_jsonObj.DomainList.Any(d => d.DomainName == domain || d.Tld == tld)) {
+                throw new DomainAlreadyExistsException($"The domain { domainName } already exists in the database!");
+            }
+
             var newDomain = new Domain(m_jsonObj.DomainList.Count + 1, tld, domainName);
             m_jsonObj.DomainList.Add(newDomain);
             await DumpJsonAsync();
@@ -194,8 +206,12 @@ namespace Hermod.EmailImport.Data {
             return newDomain;
         }
 
-        public override Task<bool> RemoveDomainAsync(Domain domain) {
-            throw new NotImplementedException();
+        /// <inheritdoc/>
+        public override async Task<bool> RemoveDomainAsync(Domain domain) {
+            var removed = m_jsonObj.DomainList.Remove(domain);
+            await DumpJsonAsync();
+
+            return removed;
         }
     }
 }
