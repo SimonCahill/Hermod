@@ -126,19 +126,8 @@ namespace Hermod.EmailImport {
                 byte[] initVec = null;
 
                 void GetEncryptionData(ref byte[] encKey, ref byte[] initVec) {
-                    var tmpKey = m_pluginDelegator?.GetApplicationConfig<string?>("Accounts.EncryptionKey");
-                    if (string.IsNullOrEmpty(tmpKey)) {
-                        m_pluginDelegator?.Information("Found invalid encryption keys! Generating new encryption data...");
-                        JsonDatabaseConnector.GenerateNewAesKey(out encKey, out initVec);
-
-                        m_pluginDelegator?.TrySetApplicationConfig("Accounts.EncryptionKey", encKey);
-                        m_pluginDelegator?.TrySetApplicationConfig("Accounts.EncryptionInitVec", initVec);
-                        return;
-                    }
-                    Base64.DecodeFromUtf8(Encoding.UTF8.GetBytes(tmpKey), encKey, out _, out _);
-
-                    tmpKey = m_pluginDelegator?.GetApplicationConfig<string?>("Accounts.EncryptionInitVec");
-                    if (string.IsNullOrEmpty(tmpKey)) {
+                    var tmpKey = m_pluginDelegator?.GetApplicationConfig<byte[]>("Accounts.EncryptionKey");
+                    if (tmpKey is null || tmpKey.Length == 0) {
                         m_pluginDelegator?.Information("Found invalid encryption keys! Generating new encryption data...");
                         JsonDatabaseConnector.GenerateNewAesKey(out encKey, out initVec);
 
@@ -147,7 +136,21 @@ namespace Hermod.EmailImport {
                         return;
                     }
 
-                    Base64.DecodeFromUtf8(Encoding.UTF8.GetBytes(tmpKey), initVec, out _, out _);
+                    if (encKey is null) { encKey = new byte[tmpKey.Length]; }
+                    Array.Copy(tmpKey, encKey, tmpKey.Length);
+
+                    tmpKey = m_pluginDelegator?.GetApplicationConfig<byte[]>("Accounts.EncryptionInitVec");
+                    if (tmpKey is null || tmpKey.Length == 0) {
+                        m_pluginDelegator?.Information("Found invalid encryption keys! Generating new encryption data...");
+                        JsonDatabaseConnector.GenerateNewAesKey(out encKey, out initVec);
+
+                        m_pluginDelegator?.TrySetApplicationConfig("Accounts.EncryptionKey", encKey);
+                        m_pluginDelegator?.TrySetApplicationConfig("Accounts.EncryptionInitVec", initVec);
+                        return;
+                    }
+
+                    if (initVec is null) { initVec = new byte[tmpKey.Length]; }
+                    Array.Copy(tmpKey, initVec, tmpKey.Length);
                 }
 
                 GetEncryptionData(ref encKey, ref initVec);
