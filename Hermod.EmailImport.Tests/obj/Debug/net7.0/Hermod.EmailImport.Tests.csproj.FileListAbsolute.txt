@@ -1,6 +1,5 @@
 /Users/simoncahill/Projects/Hermod/Hermod.EmailImport.Tests/bin/Debug/net7.0/CoverletSourceRootsMapping
 /Users/simoncahill/Projects/Hermod/Hermod.EmailImport.Tests/bin/Debug/net7.0/Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll
-/Users/simoncahill/Projects/Hermod/Hermod.EmailImport.Tests/bin/Debug/net7.0/Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll
 /Users/simoncahill/Projects/Hermod/Hermod.EmailImport.Tests/bin/Debug/net7.0/Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll
 /Users/simoncahill/Projects/Hermod/Hermod.EmailImport.Tests/bin/Debug/net7.0/Microsoft.TestPlatform.AdapterUtilities.dll
 /Users/simoncahill/Projects/Hermod/Hermod.EmailImport.Tests/bin/Debug/net7.0/Hermod.EmailImport.Tests.deps.json
@@ -113,3 +112,16 @@
 /Users/simoncahill/Projects/Hermod/Hermod.EmailImport.Tests/obj/Debug/net7.0/Hermod.EmailImport.Tests.pdb
 /Users/simoncahill/Projects/Hermod/Hermod.EmailImport.Tests/obj/Debug/net7.0/Hermod.EmailImport.Tests.genruntimeconfig.cache
 /Users/simoncahill/Projects/Hermod/Hermod.EmailImport.Tests/obj/Debug/net7.0/ref/Hermod.EmailImport.Tests.dll
+/Users/simoncahill/Projects/Hermod/Hermod.EmailImport.Tests/bin/Debug/net7.0/cs/Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll
+/Users/simoncahill/Projects/Hermod/Hermod.EmailImport.Tests/bin/Debug/net7.0/de/Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll
+/Users/simoncahill/Projects/Hermod/Hermod.EmailImport.Tests/bin/Debug/net7.0/es/Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll
+/Users/simoncahill/Projects/Hermod/Hermod.EmailImport.Tests/bin/Debug/net7.0/fr/Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll
+/Users/simoncahill/Projects/Hermod/Hermod.EmailImport.Tests/bin/Debug/net7.0/it/Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll
+/Users/simoncahill/Projects/Hermod/Hermod.EmailImport.Tests/bin/Debug/net7.0/ja/Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll
+/Users/simoncahill/Projects/Hermod/Hermod.EmailImport.Tests/bin/Debug/net7.0/ko/Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll
+/Users/simoncahill/Projects/Hermod/Hermod.EmailImport.Tests/bin/Debug/net7.0/pl/Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll
+/Users/simoncahill/Projects/Hermod/Hermod.EmailImport.Tests/bin/Debug/net7.0/pt-BR/Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll
+/Users/simoncahill/Projects/Hermod/Hermod.EmailImport.Tests/bin/Debug/net7.0/ru/Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll
+/Users/simoncahill/Projects/Hermod/Hermod.EmailImport.Tests/bin/Debug/net7.0/tr/Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll
+/Users/simoncahill/Projects/Hermod/Hermod.EmailImport.Tests/bin/Debug/net7.0/zh-Hans/Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll
+/Users/simoncahill/Projects/Hermod/Hermod.EmailImport.Tests/bin/Debug/net7.0/zh-Hant/Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll

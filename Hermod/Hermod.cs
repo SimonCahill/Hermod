@@ -161,6 +161,21 @@ namespace Hermod {
                         WritePrompt();
                         Console.Write(lineCache.ToString());
                         continue;
+                    case ConsoleKey.C:
+                        if (keyCode.Modifiers == ConsoleModifiers.Control) {
+                            return ShowPrompt();
+                        }
+                        break;
+                    case ConsoleKey.LeftArrow:
+                        if (Console.CursorLeft > PROMPT_STR.Length) {
+                            Console.CursorLeft--;
+                        }
+                        continue;
+                    case ConsoleKey.RightArrow:
+                        if (Console.CursorLeft <= PROMPT_STR.Length + lineCache.Length) {
+                            Console.CursorLeft++;
+                        }
+                        continue;
                 }
 
                 lineCache.Append(keyCode.KeyChar);

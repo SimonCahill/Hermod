@@ -92,7 +92,13 @@ namespace Hermod.PluginFramework {
         }
 
         internal ICommandResult ExecuteCommand(params string[] commands) {
-            throw new NotImplementedException();
+            var cmd = GetAllCommands().FirstOrDefault(c => c.Name == commands[0]);
+
+            if (cmd is null) {
+                return new CommandErrorResult($"The command { commands[0] } does not exist in Hermod's namespace! Are the correct plugins loaded?");
+            }
+
+            return cmd.Execute(commands);
         }
 
     }
