@@ -1,9 +1,11 @@
 ﻿using System;
 
 namespace Hermod.EmailImport {
-    using System.Text;
+
+    using Core.Accounts;
     using Core.Commands.Results;
-    using Hermod.Core.Accounts;
+
+    using System.Text;
 
     partial class EmailImporter {
 
@@ -23,8 +25,8 @@ namespace Hermod.EmailImport {
                     foreach (var user in domain.DomainUsers) {
                         sBuilder.AppendLine($"\t\t{user.AccountName} [{user.AccountType.ToString()}]");
                     }
-                    sBuilder.AppendLine();
                 }
+               sBuilder.AppendLine();
             }
 
             return new CommandResult(sBuilder.ToString(), domains);
@@ -36,7 +38,7 @@ namespace Hermod.EmailImport {
             }
 
             var domains = m_dbConnector?.GetDomainsAsync(true).GetAwaiter().GetResult().Where(d => args.Contains(d.ToString()));
-            if (domains is null || domains.Any()) {
+            if (domains is null || !domains.Any()) {
                 return new CommandErrorResult("No domains found matching any of the inputs!");
             }
 
@@ -93,11 +95,82 @@ namespace Hermod.EmailImport {
         }
 
         private ICommandResult Handle_RemoveDomain(params string[] args) {
-            return new CommandErrorResult("This command is not yet implemented. Sorry");
+            if (args is null || args.Length == 0) {
+                return new CommandErrorResult("Unexpected end of domains!", new ArgumentNullException(nameof(args), "Domains must not be empty!"));
+            }
+
+            var domainsRemoved = 0;
+            var domainsNotRemoved = new Dictionary<string, string>();
+
+            foreach (var domain in args) {
+                if (ExecuteCommand("get-users", domain) is not CommandErrorResult) {
+                    domainsNotRemoved.Add(domain, $"{ domain } still has users! Please remove users");
+                    continue;
+                }
+
+                // this will need refactoring.
+                try {
+                    var domainResult = ExecuteCommand("get-domain", domain);
+                    if (domainResult is not null && domainResult is CommandErrorResult e) {
+                        domainsNotRemoved.Add(domain, e.Message ?? "Unknown error");
+                        continue;
+                    } else if (domainResult is not null && domainResult is CommandResult r) {
+                        if (r.Result is not Domain) {
+                            domainsNotRemoved.Add(domain, r.Message ?? "Unknown error");
+                            continue;
+                        } else if (r.Result is Domain d) {
+                            if (m_dbConnector?.RemoveDomainAsync(d).GetAwaiter().GetResult() == true) {
+                                domainsRemoved++;
+                            } else {
+                                domainsNotRemoved.Add(domain, "Unknown error");
+                            }
+                        }
+                    }
+                } catch (Exception ex) {
+                    domainsNotRemoved.Add(domain, ex.Message);
+                }
+            }
+
+            if (domainsNotRemoved.Count > 0) {
+                var sBuilder = new StringBuilder().AppendLine($"Removed {domainsRemoved}/{args.Length} domains!");
+
+                foreach (var domain in domainsNotRemoved) {
+                    sBuilder.Append($"\tDomain not removed: { domain.Key }. Reason: { domain.Value }.");
+                }
+                return new CommandErrorResult(sBuilder.ToString());
+            }
+
+            return new CommandResult($"Removed { domainsRemoved } domains.", null);
         }
 
         private ICommandResult Handle_GetUsers(params string[] args) {
-            return new CommandErrorResult("This command is not yet implemented. Sorry");
+            if (args is null || args.Length == 0) {
+                return new CommandErrorResult(
+                    "At least one domain must be supplied!",
+                    new ArgumentNullException(nameof(args), "Command arguments must not be null or empty")
+                );
+            }
+
+            var domain = ExecuteCommand("get-domain", args.First());
+            if (domain is null || domain is CommandResult result && (domain.Result is null || (domain.Result as IEnumerable<Domain>).Count() == 0)) {
+                return new CommandErrorResult($"Unknown error retrieving domain { args.First() }");
+            } else if (domain is CommandErrorResult e) {
+                return e;
+            }
+
+            var users = (domain.Result as IEnumerable<Domain>).First().DomainUsers;
+            var sBuilder = new StringBuilder()
+                .Append($"Got domain { args.First() } with { users.Count() } users");
+
+            if (users.Count > 0) {
+                sBuilder.AppendLine(":");
+
+                foreach (var user in users) {
+                    sBuilder.AppendLine($"\t{ user.AccountName } [{ user.AccountType }]");
+                }
+            }
+
+            return new CommandResult(sBuilder.ToString(), users);
         }
 
         private ICommandResult Handle_GetUser(params string[] args) {
@@ -105,7 +178,46 @@ namespace Hermod.EmailImport {
         }
 
         private ICommandResult Handle_AddUser(params string[] args) {
-            return new CommandErrorResult("This command is not yet implemented. Sorry");
+            PluginDelegator?.Warning("An attempt is being made to add a new user to a domain!");
+
+            if (args is null || args.Length != 4) {
+                return new CommandErrorResult("Insufficient arguments passed! <domain> <username> <password> <account type> required! For more info, type help add-domain");
+            }
+
+            var domainResult = ExecuteCommand("get-domain", args[0]);
+
+            var domain = default(Domain);
+
+            if (domainResult is null) {
+                return new CommandErrorResult($"Unknown error while executing command \"get-domain {args[0]}\"");
+            } else if (domainResult?.Result is CommandErrorResult e) {
+                return e;
+            } else if (domainResult?.Result is null) {
+                return new CommandErrorResult($"Failed to retrieve domain { args[0] }! Does it exist?");
+            }
+
+            if (domainResult?.Result is IEnumerable<Domain> list) {
+                domain = list.FirstOrDefault();
+            } else if (domainResult?.Result is Domain d) {
+                domain = d;
+            }
+
+            if (domain is null) {
+                return new CommandErrorResult($"Unknown error while retrieving domain { args[0] }!");
+            }
+
+            try {
+                return new CommandResult(
+                    $"Added { args[1] } to { domain.DomainName }",
+                    m_dbConnector?.AddUserToDomainAsync(
+                        domain, args[1], args[2], Enum.Parse<AccountType>(args[3], true)
+                    )
+                );
+            } catch (Exception ex) {
+                return new CommandErrorResult($"Failed to add user { args[1] } to domain { domain.DomainName }!", ex);
+            } finally {
+                args = null;
+            }
         }
 
         private ICommandResult Handle_RemoveUser(params string[] args) {
