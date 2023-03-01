@@ -130,6 +130,9 @@ namespace Hermod.EmailImport {
                     if (string.IsNullOrEmpty(tmpKey)) {
                         m_pluginDelegator?.Information("Found invalid encryption keys! Generating new encryption data...");
                         JsonDatabaseConnector.GenerateNewAesKey(out encKey, out initVec);
+
+                        m_pluginDelegator?.TrySetApplicationConfig("Accounts.EncryptionKey", encKey);
+                        m_pluginDelegator?.TrySetApplicationConfig("Accounts.EncryptionInitVec", initVec);
                         return;
                     }
                     Base64.DecodeFromUtf8(Encoding.UTF8.GetBytes(tmpKey), encKey, out _, out _);
@@ -138,6 +141,9 @@ namespace Hermod.EmailImport {
                     if (string.IsNullOrEmpty(tmpKey)) {
                         m_pluginDelegator?.Information("Found invalid encryption keys! Generating new encryption data...");
                         JsonDatabaseConnector.GenerateNewAesKey(out encKey, out initVec);
+
+                        m_pluginDelegator?.TrySetApplicationConfig("Accounts.EncryptionKey", encKey);
+                        m_pluginDelegator?.TrySetApplicationConfig("Accounts.EncryptionInitVec", initVec);
                         return;
                     }
 
