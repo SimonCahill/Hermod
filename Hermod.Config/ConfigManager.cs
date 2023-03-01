@@ -351,7 +351,7 @@ namespace Hermod.Config {
                 var subConfig = configName.Substring(periodPos + 1);
                 var subConfigHasDotNotation = ConfigDotNotation().IsMatch(subConfig);
 
-                if (dict.ContainsKey(container) && subConfigHasDotNotation) {
+                if (dict.ContainsKey(container)) {
                     var token = dict[container];
                     if (token?.Type != JTokenType.Object) {
                         throw new ConfigException($"Config type mismatch! Expected object; got { token?.Type.ToString() }");
