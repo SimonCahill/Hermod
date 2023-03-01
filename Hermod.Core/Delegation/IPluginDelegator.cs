@@ -88,6 +88,23 @@ namespace Hermod.Core.Delegation {
         bool TryGetApplicationConfig<T>(string config, out T? value);
 
         /// <summary>
+        /// Sets a configuration value.
+        /// </summary>
+        /// <typeparam name="T">The type of the config.</typeparam>
+        /// <param name="config">The name of the config to set.</param>
+        /// <param name="value">The new value of the config.</param>
+        public void SetApplicationConfig<T>(string config, T value);
+
+        /// <summary>
+        /// Tries to set an application config.
+        /// </summary>
+        /// <typeparam name="T">The type of the config.</typeparam>
+        /// <param name="config">The name of the config to set.</param>
+        /// <param name="value">The new value of the config.</param>
+        /// <returns></returns>
+        public bool TrySetApplicationConfig<T>(string config, T value);
+
+        /// <summary>
         /// Logs an information message to the logger.
         /// </summary>
         /// <remarks >
