@@ -37,7 +37,6 @@ namespace Hermod.EmailImport {
 
         volatile bool m_keepThreadAlive = false;
         DatabaseConnector? m_dbConnector;
-        IPluginDelegator? m_pluginDelegator = null;
         Thread? m_importThread = null;
 
         public EmailImporter(): base(nameof(EmailImporter), new Version(0, 0, 1)) {
@@ -104,10 +103,10 @@ namespace Hermod.EmailImport {
         public override void OnConfigLoaded() { }
 
         public override void OnLoad(IPluginDelegator pluginDelegator) {
-            m_pluginDelegator = pluginDelegator;
+            base.OnLoad(pluginDelegator);
 
-            if (m_pluginDelegator.GetApplicationConfig<bool>("Accounts.UseDatabase")) {
-                // dynamic dbInfo = m_pluginDelegator.GetApplicationConfig<object>("Accounts.DatabaseInfo");
+            if (PluginDelegator.GetApplicationConfig<bool>("Accounts.UseDatabase")) {
+                // dynamic dbInfo = PluginDelegator.GetApplicationConfig<object>("Accounts.DatabaseInfo");
                 // m_dbConnector = new MySqlDatabaseConnector(
                 //     dbInfo.Host,
                 //     dbInfo.DatabaseUser,
@@ -116,8 +115,8 @@ namespace Hermod.EmailImport {
                 //     pluginDelegator
                 // );
                 throw new Exception("MySqlDatabaseConnector is not usable in this version!");
-            } else if (m_pluginDelegator.GetApplicationConfig<bool>("Accounts.UseJsonFile")) {
-                var filePath = m_pluginDelegator.GetApplicationConfig<string?>("Accounts.JsonFileInfo.FilePath");
+            } else if (PluginDelegator.GetApplicationConfig<bool>("Accounts.UseJsonFile")) {
+                var filePath = PluginDelegator.GetApplicationConfig<string?>("Accounts.JsonFileInfo.FilePath");
                 if (filePath is null) {
                     filePath = AppInfo.GetLocalHermodDirectory().GetSubFile(".accounts.json").FullName;
                 }
@@ -126,26 +125,26 @@ namespace Hermod.EmailImport {
                 byte[] initVec = null;
 
                 void GetEncryptionData(ref byte[] encKey, ref byte[] initVec) {
-                    var tmpKey = m_pluginDelegator?.GetApplicationConfig<byte[]>("Accounts.EncryptionKey");
+                    var tmpKey = PluginDelegator?.GetApplicationConfig<byte[]>("Accounts.EncryptionKey");
                     if (tmpKey is null || tmpKey.Length == 0) {
-                        m_pluginDelegator?.Information("Found invalid encryption keys! Generating new encryption data...");
+                        PluginDelegator?.Information("Found invalid encryption keys! Generating new encryption data...");
                         JsonDatabaseConnector.GenerateNewAesKey(out encKey, out initVec);
 
-                        m_pluginDelegator?.TrySetApplicationConfig("Accounts.EncryptionKey", encKey);
-                        m_pluginDelegator?.TrySetApplicationConfig("Accounts.EncryptionInitVec", initVec);
+                        PluginDelegator?.TrySetApplicationConfig("Accounts.EncryptionKey", encKey);
+                        PluginDelegator?.TrySetApplicationConfig("Accounts.EncryptionInitVec", initVec);
                         return;
                     }
 
                     if (encKey is null) { encKey = new byte[tmpKey.Length]; }
                     Array.Copy(tmpKey, encKey, tmpKey.Length);
 
-                    tmpKey = m_pluginDelegator?.GetApplicationConfig<byte[]>("Accounts.EncryptionInitVec");
+                    tmpKey = PluginDelegator?.GetApplicationConfig<byte[]>("Accounts.EncryptionInitVec");
                     if (tmpKey is null || tmpKey.Length == 0) {
-                        m_pluginDelegator?.Information("Found invalid encryption keys! Generating new encryption data...");
+                        PluginDelegator?.Information("Found invalid encryption keys! Generating new encryption data...");
                         JsonDatabaseConnector.GenerateNewAesKey(out encKey, out initVec);
 
-                        m_pluginDelegator?.TrySetApplicationConfig("Accounts.EncryptionKey", encKey);
-                        m_pluginDelegator?.TrySetApplicationConfig("Accounts.EncryptionInitVec", initVec);
+                        PluginDelegator?.TrySetApplicationConfig("Accounts.EncryptionKey", encKey);
+                        PluginDelegator?.TrySetApplicationConfig("Accounts.EncryptionInitVec", initVec);
                         return;
                     }
 
@@ -158,14 +157,15 @@ namespace Hermod.EmailImport {
                     new FileInfo(filePath),
                     encKey, initVec
                 );
+                m_dbConnector.Connect();
             } else {
                 throw new InvalidDataSourceException();
             }
 
-            m_pluginDelegator.Debug("Subscribing all topics...");
+            PluginDelegator.Debug("Subscribing all topics...");
             pluginDelegator.SubscribeTopics(m_subscribeTopics);
 
-            m_pluginDelegator.Information("Email Importer has loaded!");
+            PluginDelegator.Information("Email Importer has loaded!");
         }
 
         public override void OnStart() {
@@ -175,7 +175,7 @@ namespace Hermod.EmailImport {
         }
 
         public override void OnStop() {
-            m_pluginDelegator?.Information("Stopping worker threads...");
+            PluginDelegator?.Information("Stopping worker threads...");
             m_keepThreadAlive = false;
         }
     }
