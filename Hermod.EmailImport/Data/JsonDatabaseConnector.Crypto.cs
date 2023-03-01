@@ -3,6 +3,7 @@
 namespace Hermod.EmailImport.Data {
     using System.Runtime.CompilerServices;
     using System.Security.Cryptography;
+    using System.Text;
 
     partial class JsonDatabaseConnector {
 
@@ -14,7 +15,7 @@ namespace Hermod.EmailImport.Data {
         /// </summary>
         /// <param name="bytes">The cipher text to decrypt.</param>
         /// <returns>The decrypted string.</returns>
-        private string DecryptString(byte[] bytes) {
+        public string DecryptString(byte[] bytes) {
             using var aes = Aes.Create();
 
             aes.IV = m_initVector;
@@ -34,7 +35,7 @@ namespace Hermod.EmailImport.Data {
         /// </summary>
         /// <param name="bytes">The cipher text to decrypt.</param>
         /// <returns>The decrypted string.</returns>
-        private async Task<string> DecryptStringAsync(byte[] bytes) {
+        public async Task<string> DecryptStringAsync(byte[] bytes) {
             using var aes = Aes.Create();
 
             aes.IV = m_initVector;
@@ -54,7 +55,7 @@ namespace Hermod.EmailImport.Data {
         /// </summary>
         /// <param name="plaintext">The plaintext string to encrypt.</param>
         /// <returns>The encrypted string as a series of bytes.</returns>
-        private byte[] EncryptString(string plaintext) {
+        public byte[] EncryptString(string plaintext) {
             using var aes = Aes.Create();
 
             aes.IV = m_initVector;
@@ -64,9 +65,11 @@ namespace Hermod.EmailImport.Data {
 
             using var memStream = new MemoryStream();
             using var cryptoStream = new CryptoStream(memStream, encryptor, CryptoStreamMode.Write);
-            using var swriter = new StreamWriter(cryptoStream);
 
-            swriter.Write(plaintext);
+            var textBytes = Encoding.UTF8.GetBytes(plaintext);
+            cryptoStream.Write(textBytes, 0, textBytes.Length);
+            cryptoStream.Close();
+
             var encryptedBytes = memStream.ToArray();
 
             return encryptedBytes;
@@ -77,7 +80,7 @@ namespace Hermod.EmailImport.Data {
         /// </summary>
         /// <param name="plaintext">The plaintext string to encrypt.</param>
         /// <returns>An awaitable <see cref="Task{Byte[]}"/> containing the encrypted data.</returns>
-        private async Task<byte[]> EncryptStringAsync(string plaintext) {
+        public async Task<byte[]> EncryptStringAsync(string plaintext) {
             using var aes = Aes.Create();
 
             aes.IV = m_initVector;
@@ -88,9 +91,10 @@ namespace Hermod.EmailImport.Data {
 
             using var memStream = new MemoryStream();
             using var cryptoStream = new CryptoStream(memStream, encryptor, CryptoStreamMode.Write);
-            using var swriter = new StreamWriter(cryptoStream);
 
-            await swriter.WriteAsync(plaintext.ToArray(), 0, plaintext.Length);
+            var textBytes = Encoding.UTF8.GetBytes(plaintext);
+            await cryptoStream.WriteAsync(textBytes, 0, textBytes.Length);
+            cryptoStream.Close();
             encryptedBytes = memStream.ToArray();
 
             return encryptedBytes;
