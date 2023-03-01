@@ -110,6 +110,27 @@ namespace Hermod.Core.Accounts {
         public List<DomainUser> DomainUsers { get; set; }
 
         /// <summary>
+        /// Gets a string representation of this domain.
+        /// </summary>
+        /// <returns>A string representing this domain in the form of TLD.DOMAIN</returns>
+        public override string ToString() => $"{ Tld }.{ DomainName }";
+
+        public override bool Equals(object? obj) {
+            if (obj is null || obj is not Domain d) { return false; }
+
+            // Thanks Jon Skeet!
+            var firstNotSecond = d.DomainUsers.Except(DomainUsers);
+            var secondNotFirst = DomainUsers.Except(d.DomainUsers);
+
+            return d.Tld == Tld &&
+                   d.DomainName == DomainName &&
+                   !firstNotSecond.Any() && !secondNotFirst.Any();
+        }
+
+        public static bool operator ==(Domain? a, object? b) => a?.Equals(b) == true;
+        public static bool operator !=(Domain? a, object? b) => a?.Equals(b) == false;
+
+        /// <summary>
         /// Gets a value indicating whether or not a given domain is valid.
         /// </summary>
         /// <remarks >
