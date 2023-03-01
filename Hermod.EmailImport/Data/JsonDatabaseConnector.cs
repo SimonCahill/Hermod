@@ -9,6 +9,7 @@ namespace Hermod.EmailImport.Data {
 
     using System.IO;
     using System.Security.Cryptography;
+    using System.Text;
 
     /// <summary>
     /// A <see cref="DatabaseConnector"/> which "connects" to an encrypted JSON file containing all domain and user information.
@@ -195,7 +196,7 @@ namespace Hermod.EmailImport.Data {
                 throw new Exception("An unknown exception has occurred!"); // this should never happen
             }
 
-            if (m_jsonObj.DomainList.Any(d => d.DomainName == domain || d.Tld == tld)) {
+            if (m_jsonObj.DomainList.Any(d => d.DomainName == domain && d.Tld == tld)) {
                 throw new DomainAlreadyExistsException($"The domain { domainName } already exists in the database!");
             }
 
@@ -212,6 +213,25 @@ namespace Hermod.EmailImport.Data {
             await DumpJsonAsync();
 
             return removed;
+        }
+
+        /// <inheritdoc/>
+        public override async Task<DomainUser> AddUserToDomainAsync(Domain domain, string user, string password, AccountType accountType) {
+            var domainInList = m_jsonObj.DomainList.First(d => domain.Equals(domain));
+
+            byte[] entropy = null;
+            DomainUser.GenerateEntropy(ref entropy);
+
+            var saltedPlaintext = password + Encoding.UTF8.GetString(entropy);
+            password = null; // Yes, we're not clearing the string but this gives the GC a better chance at cleaning the data
+
+            var encryptedPassword = await EncryptStringAsync(saltedPlaintext);
+            saltedPlaintext = null;
+
+            domainInList.DomainUsers.Add(new DomainUser(domainInList.DomainUsers.Count + 1, user, encryptedPassword, entropy, accountType));
+            await DumpJsonAsync();
+
+            return domainInList.DomainUsers.Last();
         }
     }
 }
