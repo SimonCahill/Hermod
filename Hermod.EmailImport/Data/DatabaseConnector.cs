@@ -96,6 +96,16 @@ namespace Hermod.EmailImport.Data {
         /// <returns><code >true</code> if the domain was removed. <code >false</code> otherwise.</returns>
         /// <exception cref="Core.Exceptions.DomainAlreadyExistsException" >If the domain already exists.</exception>
         public abstract Task<bool> RemoveDomainAsync(Domain domain);
+
+        /// <summary>
+        /// Creates a new <see cref="DomainUser"/> instance and adds it to the <paramref name="domain"/>.
+        /// </summary>
+        /// <param name="domain">The domain to which to add the user.</param>
+        /// <param name="user">The user account name.</param>
+        /// <param name="password">The password for the user.</param>
+        /// <param name="accountType">The account type.</param>
+        /// <returns>A reference to the newly created user.</returns>
+        public abstract Task<DomainUser> AddUserToDomainAsync(Domain domain, string user, string password, AccountType accountType);
     }
 }
 
