@@ -217,7 +217,7 @@ namespace Hermod.EmailImport.Data {
 
         /// <inheritdoc/>
         public override async Task<DomainUser> AddUserToDomainAsync(Domain domain, string user, string password, AccountType accountType) {
-            var domainInList = m_jsonObj.DomainList.First(d => domain.Equals(domain));
+            var domainInList = m_jsonObj.DomainList.First(d => domain.Tld == d.Tld && domain.DomainName == d.DomainName);
 
             byte[] entropy = null;
             DomainUser.GenerateEntropy(ref entropy);

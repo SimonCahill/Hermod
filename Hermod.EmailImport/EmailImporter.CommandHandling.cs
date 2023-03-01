@@ -51,7 +51,7 @@ namespace Hermod.EmailImport {
                     sBuilder.AppendLine(":");
 
                     foreach (var user in domain.DomainUsers) {
-                        sBuilder.AppendLine($"\t\t{ user.AccountName } [{ user.AccountType.ToString() }]");
+                        sBuilder.AppendLine($"\t\t{ user.AccountName } PW: ***** Salt: ********** [{ user.AccountType.ToString() }]");
                     }
                     sBuilder.AppendLine();
                 }
@@ -208,7 +208,7 @@ namespace Hermod.EmailImport {
 
             try {
                 return new CommandResult(
-                    $"Added { args[1] } to { domain.DomainName }",
+                    $"Added { args[1] } to { domain.Tld }.{ domain.DomainName }",
                     m_dbConnector?.AddUserToDomainAsync(
                         domain, args[1], args[2], Enum.Parse<AccountType>(args[3], true)
                     )
