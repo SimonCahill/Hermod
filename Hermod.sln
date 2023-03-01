@@ -26,6 +26,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hermod.Core.Tests", "Hermod.Core.Tests\Hermod.Core.Tests.csproj", "{40B7B1AA-3F3A-47B6-9541-2B41DDE2BDD0}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugin Tests", "Plugin Tests", "{5E28745F-B762-456A-B07C-67D28AAA7049}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hermod.EmailImport.Tests", "Hermod.EmailImport.Tests\Hermod.EmailImport.Tests.csproj", "{8266FCE1-0B77-4951-AB6A-88D001D1383A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +68,10 @@ Global
 		{40B7B1AA-3F3A-47B6-9541-2B41DDE2BDD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{40B7B1AA-3F3A-47B6-9541-2B41DDE2BDD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{40B7B1AA-3F3A-47B6-9541-2B41DDE2BDD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8266FCE1-0B77-4951-AB6A-88D001D1383A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8266FCE1-0B77-4951-AB6A-88D001D1383A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8266FCE1-0B77-4951-AB6A-88D001D1383A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8266FCE1-0B77-4951-AB6A-88D001D1383A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -74,6 +82,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{6E6FE737-66EA-4592-9946-4C6CB4634D7F} = {A9533FC8-44E0-4DFB-8C0C-47DF6476CE87}
 		{FD2AFF5C-1AD9-42E9-B6BB-A46C7D73FE12} = {A9533FC8-44E0-4DFB-8C0C-47DF6476CE87}
+		{5E28745F-B762-456A-B07C-67D28AAA7049} = {A9533FC8-44E0-4DFB-8C0C-47DF6476CE87}
+		{8266FCE1-0B77-4951-AB6A-88D001D1383A} = {5E28745F-B762-456A-B07C-67D28AAA7049}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
