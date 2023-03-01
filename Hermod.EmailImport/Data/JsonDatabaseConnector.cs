@@ -199,7 +199,7 @@ namespace Hermod.EmailImport.Data {
                 throw new DomainAlreadyExistsException($"The domain { domainName } already exists in the database!");
             }
 
-            var newDomain = new Domain(m_jsonObj.DomainList.Count + 1, tld, domainName);
+            var newDomain = new Domain(m_jsonObj.DomainList.Count + 1, tld, domain);
             m_jsonObj.DomainList.Add(newDomain);
             await DumpJsonAsync();
 
