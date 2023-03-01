@@ -67,8 +67,9 @@ namespace Hermod.EmailImport.Data {
             using var swriter = new StreamWriter(cryptoStream);
 
             swriter.Write(plaintext);
+            var encryptedBytes = memStream.ToArray();
 
-            return memStream.ToArray();
+            return encryptedBytes;
         }
 
         /// <summary>
@@ -83,14 +84,16 @@ namespace Hermod.EmailImport.Data {
             aes.Key = m_encKey;
 
             var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+            byte[] encryptedBytes;
 
             using var memStream = new MemoryStream();
             using var cryptoStream = new CryptoStream(memStream, encryptor, CryptoStreamMode.Write);
             using var swriter = new StreamWriter(cryptoStream);
 
-            await swriter.WriteAsync(plaintext);
+            await swriter.WriteAsync(plaintext.ToArray(), 0, plaintext.Length);
+            encryptedBytes = memStream.ToArray();
 
-            return memStream.ToArray();
+            return encryptedBytes;
         }
 
         /// <summary>
