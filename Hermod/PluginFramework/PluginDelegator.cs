@@ -82,6 +82,19 @@ namespace Hermod.PluginFramework {
 
             return true;
         }
+
+        /// <inheritdoc/>
+        public void SetApplicationConfig<T>(string config, T value) {
+            ConfigManager.Instance.SetConfig(config, value);
+            ConfigManager.Instance.SaveConfig();
+        }
+
+        /// <inheritdoc/>
+        public bool TrySetApplicationConfig<T>(string config, T value) {
+            try { SetApplicationConfig(config, value); } catch { return false; }
+
+            return true;
+        }
     }
 }
 
