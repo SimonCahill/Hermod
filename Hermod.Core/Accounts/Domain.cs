@@ -122,6 +122,16 @@ namespace Hermod.Core.Accounts {
         public List<DomainUser> DomainUsers { get; set; }
 
         /// <summary>
+        /// Gets or sets the IMAP/POP3 server address.
+        /// </summary>
+        public string? ServerAddress { get; set; }
+
+        /// <summary>
+        /// Gets or sets the port the IMAP/POP3 server listens to.
+        /// </summary>
+        public ushort ServerPort { get; set; }
+
+        /// <summary>
         /// Gets a string representation of this domain.
         /// </summary>
         /// <returns>A string representing this domain in the form of TLD.DOMAIN</returns>
