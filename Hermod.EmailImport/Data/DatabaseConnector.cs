@@ -106,6 +106,22 @@ namespace Hermod.EmailImport.Data {
         /// <param name="accountType">The account type.</param>
         /// <returns>A reference to the newly created user.</returns>
         public abstract Task<DomainUser> AddUserToDomainAsync(Domain domain, string user, string password, AccountType accountType);
+
+        /// <summary>
+        /// Decrypts the password stored in a <see cref="DomainUser"/>
+        /// </summary>
+        /// <param name="user">The user.</param>
+        /// <returns>The decrypted and unsalted password.</returns>
+        public abstract Task<string> DecryptUserPassword(DomainUser user);
+
+        /// <summary>
+        /// Sets the <see cref="DomainUser.LastEmailRetrieval"/> time for each user.
+        /// </summary>
+        /// <param name="domain">The domain in which the user resides.</param>
+        /// <param name="user" >The user for which to set the last retrievel time.</param>
+        /// <param name="dateTime">The last retrieval time.</param>
+        /// <returns>An awaitable <see cref="Task"/></returns>
+        public abstract Task SetLastEmailRetrievalAsync(Domain domain, DomainUser user, DateTime? dateTime = null);
     }
 }
 

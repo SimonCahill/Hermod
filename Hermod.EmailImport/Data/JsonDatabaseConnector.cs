@@ -233,6 +233,23 @@ namespace Hermod.EmailImport.Data {
 
             return domainInList.DomainUsers.Last();
         }
+
+        /// <inheritdoc/>
+        public override async Task<string> DecryptUserPassword(DomainUser user) {
+            var decryptedPassword = await DecryptStringAsync(user.EncryptedPassword);
+            var saltString = Encoding.UTF8.GetString(user.PasswordSalt);
+            return decryptedPassword.Substring(decryptedPassword.Length - saltString.Length);
+        }
+
+        /// <inheritdoc/>
+        public override Task SetLastEmailRetrievalAsync(Domain domain, DomainUser user, DateTime? dateTime = null) {
+            var listDomain = m_jsonObj.DomainList.First(d => domain == d);
+
+            var domainUser = listDomain.DomainUsers.First(u => u.AccountName == user.AccountName && u.AccountType == user.AccountType);
+            domainUser.LastEmailRetrieval = dateTime ?? DateTime.Now;
+
+            return Task.CompletedTask;
+        }
     }
 }
 
