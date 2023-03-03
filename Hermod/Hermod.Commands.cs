@@ -66,6 +66,12 @@ namespace Hermod {
                 "\tunload-plugin --all, -a # unload all plugins",
                 HandleUnloadPlugin,
                 new getopt.net.Option { Name = "all", ArgumentType = getopt.net.ArgumentType.None, Value = 'a' }
+            ),
+            new TerminalCommand(
+                "get-topics", "Gets a list of all topics known to Hermod",
+                "Retrieves a list of all topics subscribed to within this instance of Hermod.\n" +
+                "Usage: get-topics",
+                HandleGetTopics
             )
         };
 
@@ -74,8 +80,8 @@ namespace Hermod {
 
             var sBuilder = new StringBuilder();
 
-            void DumpCommandShortHelp(ICommand command) {
-                sBuilder.AppendLine($"{ command.Name,-30 }{ command.ShortDescription,-80 }");
+            void DumpCommandShortHelp(ICommand command, bool doubleTab = false) {
+                sBuilder.AppendLine($"{ (doubleTab ? "\t\t" : "\t") }{ command.Name,-30 }{ command.ShortDescription,-80 }");
             }
 
             sBuilder.AppendLine("Built-ins:");
@@ -87,7 +93,7 @@ namespace Hermod {
 
             sBuilder.AppendLine("Plugin provided:");
             foreach (var plugin in PluginRegistry.Instance.Plugins) {
-                sBuilder.AppendLine($"{ plugin.PluginName }:");
+                sBuilder.AppendLine($" - { plugin.PluginName }:");
                 foreach (var command in plugin.PluginCommands) {
                     DumpCommandShortHelp(command);
                 }
@@ -143,6 +149,26 @@ namespace Hermod {
                 .ForEach(x => sBuilder.AppendLine(x));
 
             return new CommandResult(sBuilder.ToString(), null);
+        }
+
+        private ICommandResult HandleGetTopics(params string[] args) {
+            var topicSubscriptions = PluginRegistry.Instance.TopicSubscriptions;
+
+            if (topicSubscriptions.Count == 0) {
+                return new CommandErrorResult("No topics are currently known to Hermod!");
+            }
+
+            var sBuilder = new StringBuilder();
+
+            foreach (var topicSubscription in topicSubscriptions) {
+                sBuilder.AppendLine($"{ topicSubscription.Key }: ({ topicSubscription.Value.Count } subscribers)");
+
+                foreach (var plugin in topicSubscription.Value) {
+                    sBuilder.AppendLine($"\t - { plugin.PluginName }");
+                }
+            }
+
+            return new CommandResult($"Found { topicSubscriptions.Count } topics!\n{ sBuilder.ToString() }", null); // do not allow other plugins to know which plugin subscribed what
         }
 
     }
