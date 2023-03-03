@@ -48,12 +48,11 @@ namespace Hermod {
             m_appLogger.Information("Loading plugins...");
             m_appLogger.Information($"Plugin dir: { m_configManager.GetPluginInstallDir() }");
             foreach (var plugin in m_configManager.GetPluginInstallDir().EnumerateFiles("*.dll")) {
-                m_appLogger.Information($"Attempting to load { plugin.FullName }...");
                 try {
-                    PluginRegistry.Instance.LoadPlugin(plugin);
+                    PluginRegistry.Instance.LoadPlugin(plugin, true);
                 } catch (Exception ex) {
                     m_appLogger.Error($"Failed to load assembly { plugin.FullName }!");
-                    m_appLogger.Error($"Error: { ex.Message }");
+                    m_appLogger.Debug($"Error: { ex.Message }");
 
                     m_appLogger.Debug(ex.StackTrace);
                 }
