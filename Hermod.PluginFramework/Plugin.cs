@@ -113,31 +113,36 @@ namespace Hermod.PluginFramework {
 		/// Logs an informational message.
 		/// </summary>
 		/// <param name="msg">The message to log.</param>
-		protected virtual void LogInfo(string msg) => PluginDelegator?.Information(msg);
+		/// <param name="args" >Positional arguments to format into the message.</param>
+		protected virtual void LogInfo(string msg, params object[] args) => PluginDelegator?.Information(msg, args);
 
         /// <summary>
         /// Logs an error message.
         /// </summary>
         /// <param name="msg">The message to log.</param>
-        protected virtual void LogError(string msg) => PluginDelegator?.Error(msg);
+		/// <param name="args" >Positional arguments to format into the message.</param>
+        protected virtual void LogError(string msg, params object[] args) => PluginDelegator?.Error(msg, args);
 
         /// <summary>
         /// Logs a warning message.
         /// </summary>
         /// <param name="msg">The message to log.</param>
-        protected virtual void LogWarning(string msg) => PluginDelegator?.Warning(msg);
+		/// <param name="args" >Positional arguments to format into the message.</param>
+        protected virtual void LogWarning(string msg, params object[] args) => PluginDelegator?.Warning(msg, args);
 
         /// <summary>
         /// Logs a debug message.
         /// </summary>
         /// <param name="msg">The message to log.</param>
-        protected virtual void LogDebug(string msg) => PluginDelegator?.Debug(msg);
+		/// <param name="args" >Positional arguments to format into the message.</param>
+        protected virtual void LogDebug(string msg, params object[] args) => PluginDelegator?.Debug(msg, args);
 
         /// <summary>
         /// Logs a verbose message.
         /// </summary>
         /// <param name="msg">The message to log.</param>
-        protected virtual void LogVerbose(string msg) => PluginDelegator?.Trace(msg);
+		/// <param name="args" >Positional arguments to format into the message.</param>
+        protected virtual void LogVerbose(string msg, params object[] args) => PluginDelegator?.Trace(msg, args);
 
     }
 }
