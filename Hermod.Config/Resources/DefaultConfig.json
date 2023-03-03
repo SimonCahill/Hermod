@@ -12,41 +12,40 @@
 // © Simon Cahill 2023                    //
 ////////////////////////////////////////////
 
-
 {
-  "Plugins": {
-    "PluginRepository": {
-      "Url": "https://hermod.simonc.eu/plugin_repository"
-    },
-    "IgnoreList": [
-      // enter any plugins you don't want to load on startup here
-    ],
-    "InstallDir": null // leave this as null to use the default!
-  },
-
-  "Logging": {
-    "ConsoleLogging": {
-      "EnableLogging": true,
-      "LogLevel": "warning"
+    "Plugins": {
+        "PluginRepository": {
+            "Url": "https://hermod.simonc.eu/plugin_repository"
+        },
+        "IgnoreList": [
+            // enter any plugins you don't want to load on startup here
+        ],
+        "InstallDir": null // leave this as null to use the default!
     },
 
-    "FileLogging": {
-      "EnableLogging": false,
-      "LogLevel": "information",
+    "Logging": {
+        "ConsoleLogging": {
+            "EnableLogging": true,
+            "LogLevel": "warning"
+        },
 
-      // the log file location
-      // legal values:
-      //  - "sysdefault" -> automatically choose the correct location. E.g. /var/log/ on Linux
-      //  - "hermoddir" -> ${home_dir}/.hermod/ or whatever is configured at runtime
-      //  - /a/valid/path/to/log/dir
-      "LogLocation": "sysdefault",
-      "LogFileName": "hermod.log"
-    }
-  },
+        "FileLogging": {
+            "EnableLogging": false,
+            "LogLevel": "information",
 
-  "Terminal": {
-    "EnableInteractive": true, // enables interactive mode on the console
-  },
+            // the log file location
+            // legal values:
+            //  - "sysdefault" -> automatically choose the correct location. E.g. /var/log/ on Linux
+            //  - "hermoddir" -> ${home_dir}/.hermod/ or whatever is configured at runtime
+            //  - /a/valid/path/to/log/dir
+            "LogLocation": "sysdefault",
+            "LogFileName": "hermod.log"
+        }
+    },
+
+    "Terminal": {
+        "EnableInteractive": true // enables interactive mode on the console
+    },
 
     "Accounts": {
         "EncryptData": true,
@@ -66,12 +65,15 @@
         "UseJsonFile": true,
         "JsonFileInfo": {
             "FilePath": null // leave this to null to use the default location
-        },
-
-        "ImportIntervalInMs": 3600
+        }
     },
 
-  "Archival": {
-    "ArchivePath": null // setting this to null will cause Hermod to place the archive in the user directory
-  }
+    "EmailImporting": {
+        "ImportIntervalInMinutes": 120,
+        "ImportLocation": null // leave this as null to use the default location
+    },
+
+    "Archival": {
+        "ArchivePath": null // setting this to null will cause Hermod to place the archive in the user directory
+    }
 }
