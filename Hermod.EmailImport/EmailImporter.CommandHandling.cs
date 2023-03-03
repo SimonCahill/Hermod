@@ -174,7 +174,44 @@ namespace Hermod.EmailImport {
         }
 
         private ICommandResult Handle_GetUser(params string[] args) {
-            return new CommandErrorResult("This command is not yet implemented. Sorry");
+            if (args is null || args.Length < 2) {
+                return new CommandErrorResult($"Unsufficient arguments supplied: { ExecuteCommand("help", "get-user")?.Message }");
+            }
+
+            var domain = default(Domain);
+
+            var domainResult = ExecuteCommand("get-domain", args[0]);
+
+            if (domainResult is null) {
+                return new CommandErrorResult($"Unknown error while executing command \"get-domain {args[0]}\"");
+            } else if (domainResult?.Result is CommandErrorResult e) {
+                return e;
+            } else if (domainResult?.Result is null) {
+                return new CommandErrorResult($"Failed to retrieve domain {args[0]}! Does it exist?");
+            }
+
+            if (domainResult?.Result is IEnumerable<Domain> list) {
+                domain = list.FirstOrDefault();
+            } else if (domainResult?.Result is Domain d) {
+                domain = d;
+            }
+
+            if (domain is null) {
+                return new CommandErrorResult($"Unknown error while retrieving domain {args[0]}!");
+            }
+
+            var user = domain.DomainUsers.FirstOrDefault(u => u.AccountName == args[1]);
+
+            return
+                user is null ?
+                new CommandErrorResult($"The user { args[1] } was not found in domain { domain.ToString() }!") :
+                new CommandResult(
+                    $"Got user { user.AccountName } in { domain.ToString() }.\n" +
+                    $"\tAccount type: { user.AccountType.ToString() }\n" +
+                    $"\tPassword: **********\n" +
+                    $"\tPassword hash: **********",
+                    user
+                );
         }
 
         private ICommandResult Handle_AddUser(params string[] args) {
@@ -221,7 +258,44 @@ namespace Hermod.EmailImport {
         }
 
         private ICommandResult Handle_RemoveUser(params string[] args) {
-            return new CommandErrorResult("This command is not yet implemented. Sorry");
+            if (args is null || args.Length == 0) {
+                return new CommandErrorResult(
+                    $"Missing input parameters!\n{ ExecuteCommand("help", "remove-user")?.Message }"
+                );
+            }
+
+            var domain = default(Domain);
+
+            var domainResult = ExecuteCommand("get-domain", args[0]);
+
+            if (domainResult is null) {
+                return new CommandErrorResult($"Unknown error while executing command \"get-domain { args[0] }\"");
+            } else if (domainResult?.Result is CommandErrorResult e) {
+                return e;
+            } else if (domainResult?.Result is null) {
+                return new CommandErrorResult($"Failed to retrieve domain { args[0] }! Does it exist?");
+            }
+
+            if (domainResult?.Result is IEnumerable<Domain> list) {
+                domain = list.FirstOrDefault();
+            } else if (domainResult?.Result is Domain d) {
+                domain = d;
+            }
+
+            if (domain is null) {
+                return new CommandErrorResult($"Unknown error while retrieving domain { args[0] }!");
+            }
+
+            var user = domain.DomainUsers.FirstOrDefault(u => u.AccountName == args[1]);
+
+            if (user is null) {
+                return new CommandErrorResult($"Could not find user { args[1] } in domain { domain.DomainName }! Is this the correct domain?");
+            }
+
+            return
+                m_dbConnector?.RemoveUserFromDomainAsync(domain, user).GetAwaiter().GetResult() == true ?
+                new CommandResult($"Removed user { user.AccountName } from { domain.DomainName }", null) :
+                new CommandErrorResult($"Failed to remove { user.AccountName } from { domain.DomainName }. Unknown error!");
         }
 
     }
