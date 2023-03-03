@@ -129,7 +129,7 @@ namespace Hermod.Core.Accounts {
         /// <summary>
         /// Gets or sets the port the IMAP/POP3 server listens to.
         /// </summary>
-        public ushort ServerPort { get; set; }
+        public ushort? ServerPort { get; set; }
 
         /// <summary>
         /// Gets a string representation of this domain.
