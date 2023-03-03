@@ -70,7 +70,7 @@ namespace Hermod.Core.Accounts {
         /// <summary>
         /// Gets or sets the last time emails were imported from this account.
         /// </summary>
-        public DateTime LastEmailRetrieval { get; set; }
+        public DateTime LastEmailRetrieval { get; set; } = DateTime.MinValue;
 
         /// <summary>
         /// Generates <see cref="SaltSize"/> cryptographically random bytes and stores them in <paramref name="container"/>.
