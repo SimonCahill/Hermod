@@ -111,7 +111,8 @@ namespace Hermod.Core.Delegation {
         /// This will prefix the message with [name of plugin].
         /// </remarks>
         /// <param name="msg">The message to log.</param>
-        void Information(string? msg);
+        /// <param name="args" >The format arguments</param>
+        void Information(string msg, params object[] args);
 
         /// <summary>
         /// Logs a debug message to the logger.
@@ -120,7 +121,8 @@ namespace Hermod.Core.Delegation {
         /// This will prefix the message with [name of plugin].
         /// </remarks>
         /// <param name="msg">The message to log.</param>
-        void Debug(string? msg);
+        /// <param name="args" >The format arguments</param>
+        void Debug(string msg, params object[] args);
 
         /// <summary>
         /// Logs an error message to the logger.
@@ -129,7 +131,8 @@ namespace Hermod.Core.Delegation {
         /// This will prefix the message with [name of plugin].
         /// </remarks>
         /// <param name="msg">The message to log.</param>
-        void Error(string? msg);
+        /// <param name="args" >The format arguments</param>
+        void Error(string msg, params object[] args);
 
         /// <summary>
         /// Logs a warning message to the logger.
@@ -138,7 +141,8 @@ namespace Hermod.Core.Delegation {
         /// This will prefix the message with [name of plugin].
         /// </remarks>
         /// <param name="msg">The message to log.</param>
-        void Warning(string? msg);
+        /// <param name="args" >The format arguments</param>
+        void Warning(string msg, params object[] args);
 
         /// <summary>
         /// Logs a trace message to the logger.
@@ -147,7 +151,8 @@ namespace Hermod.Core.Delegation {
         /// This will prefix the message with [name of plugin].
         /// </remarks>
         /// <param name="msg">The message to log.</param>
-        void Trace(string? msg);
+        /// <param name="args" >The format arguments</param>
+        void Trace(string msg, params object[] args);
 
     }
 

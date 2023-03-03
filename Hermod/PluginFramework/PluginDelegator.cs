@@ -54,19 +54,19 @@ namespace Hermod.PluginFramework {
         public ICommandResult ExecuteCommand(params string[] command) => PluginRegistry.Instance.ExecuteCommand(command);
 
         /// <inheritdoc/>
-		public void Information(string? msg) => Logger?.Information($"[{ Plugin.PluginName }] {msg}");
+		public void Information(string msg, params object[] args) => Logger?.Information("[{pluginName}] " + msg, Plugin.PluginName, args);
 
         /// <inheritdoc/>
-		public void Debug(string? msg) => Logger?.Debug($"[{ Plugin.PluginName }] {msg}");
+		public void Debug(string msg, params object[] args) => Logger?.Debug("[{pluginName}] " + msg, Plugin.PluginName, args);
 
         /// <inheritdoc/>
-		public void Error(string? msg) => Logger?.Error($"[{ Plugin.PluginName }] {msg}");
+		public void Error(string msg, params object[] args) => Logger?.Error("[{pluginName}] " + msg, Plugin.PluginName, args);
 
         /// <inheritdoc/>
-		public void Warning(string? msg) => Logger?.Warning($"[{ Plugin.PluginName }] {msg}");
+		public void Warning(string msg, params object[] args) => Logger?.Warning("[{pluginName}] " + msg, Plugin.PluginName, args);
 
         /// <inheritdoc/>
-		public void Trace(string? msg) => Logger?.Verbose($"[{ Plugin.PluginName }] {msg}");
+		public void Trace(string msg, params object[] args) => Logger?.Verbose("[{pluginName}] " + msg, Plugin.PluginName, args);
 
         /// <inheritdoc/>
         public T GetApplicationConfig<T>(string config) => ConfigManager.Instance.GetConfig<T>(config);
