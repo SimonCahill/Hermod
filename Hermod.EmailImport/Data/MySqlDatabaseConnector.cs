@@ -6,7 +6,8 @@ namespace Hermod.EmailImport {
 
     using Core.Accounts;
     using Core.Delegation;
-    using Hermod.EmailImport.Data;
+    using Data;
+
     using System.Data;
     using System.Data.Common;
     using System.Data.SqlClient;
@@ -35,7 +36,7 @@ namespace Hermod.EmailImport {
         const string DomainUserDb_AccountColumnName = "AccountName";
         const string DomainUserDb_AccountPasswdColumnName = "AccountPassword";
         const string DomainUserDb_PasswdSaltColumnName = "PasswordSalt";
-        const string DomainUserDb_AccountType = "AccountType";
+        const string DomainUserDb_AccountTypeColumnName = "AccountType";
 
         private bool m_domainDbFound = false; /// indicates whether or not the domain table was found
         private bool m_domainUserDbFound = false; /// indicates whether or not the domain user table was found
@@ -220,7 +221,7 @@ namespace Hermod.EmailImport {
                         {DomainUserDb_AccountColumnName} varchar(255) not null,
                         {DomainUserDb_AccountPasswdColumnName} varchar(2048) not null,
                         {DomainUserDb_PasswdSaltColumnName} varchar(4096) not null,
-                        {DomainUserDb_AccountType} varchar(50) not null,
+                        {DomainUserDb_AccountTypeColumnName} varchar(50) not null,
                         foreign key ({DomainUserDb_DomainColumnName}) references {DomainTableName}({DomainDb_IdColumnName})
                     );
                     """
@@ -316,9 +317,9 @@ namespace Hermod.EmailImport {
                 var user = new DomainUser(
                     result.GetInt32(DomainUserDb_IdColumnName), // ID
                     result.GetString(DomainUserDb_AccountColumnName), // AccountName
-                    result.GetString(DomainUserDb_AccountPasswdColumnName), // AccountPassword
-                    result.GetString(DomainUserDb_PasswdSaltColumnName),
-                    Enum.Parse<AccountType>(result.GetString(DomainUserDb_AccountType))
+                    Encoding.UTF8.GetBytes(result.GetString(DomainUserDb_AccountPasswdColumnName)), // AccountPassword
+                    Encoding.UTF8.GetBytes(result.GetString(DomainUserDb_PasswdSaltColumnName)),
+                    Enum.Parse<AccountType>(result.GetString(DomainUserDb_AccountTypeColumnName))
                 );
 
                 domain.DomainUsers.Add(user);
@@ -327,18 +328,30 @@ namespace Hermod.EmailImport {
 
         public override Task GetUsersForDomainAsync(Domain domain) => GetUsersForDomainAsync(domain);
 
-        public override Task<int> PurgeDatabases() {
+
+        public override Task<int> PurgeDatabasesAsync() {
             throw new NotImplementedException();
         }
 
-        public override Task<bool> RemoveUserFromDomain(Domain domain, DomainUser user) {
+        public override Task<bool> RemoveUserFromDomainAsync(Domain domain, DomainUser user) {
             throw new NotImplementedException();
         }
 
-        public override Task<int> PurgeUsersFromDomain(Domain domain) {
+        public override Task<int> PurgeUsersFromDomainAsync(Domain domain) {
+            throw new NotImplementedException();
+        }
+
+        public override Task<Domain> AddDomainAsync(string domainName) {
+            throw new NotImplementedException();
+        }
+
+        public override Task<bool> RemoveDomainAsync(Domain domain) {
+            throw new NotImplementedException();
+        }
+
+        public override Task<DomainUser> AddUserToDomainAsync(Domain domain, string user, string password, AccountType accountType) {
             throw new NotImplementedException();
         }
     }
 }
-
 #endif // false
