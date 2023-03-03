@@ -68,6 +68,11 @@ namespace Hermod.Core.Accounts {
         public byte[] PasswordSalt { get; set; }
 
         /// <summary>
+        /// Gets or sets the last time emails were imported from this account.
+        /// </summary>
+        public DateTime LastEmailRetrieval { get; set; }
+
+        /// <summary>
         /// Generates <see cref="SaltSize"/> cryptographically random bytes and stores them in <paramref name="container"/>.
         /// </summary>
         /// <param name="container">A reference to the container to store the bytes in.</param>
