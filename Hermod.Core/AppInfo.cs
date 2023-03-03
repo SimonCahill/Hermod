@@ -10,6 +10,11 @@ namespace Hermod.Core {
     public static partial class AppInfo {
 
         /// <summary>
+        /// The file extension used for freshly imported emails.
+        /// </summary>
+        public static string ImportedEmailExtension = ".eml";
+
+        /// <summary>
         /// Gets the name of this application's main data directory.
         /// </summary>
         public static string HermodAppDirName => ".hermod";
