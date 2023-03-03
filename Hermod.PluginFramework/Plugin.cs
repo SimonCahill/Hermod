@@ -108,6 +108,37 @@ namespace Hermod.PluginFramework {
 
 			PluginDelegator.PublishMessage(topic, message);
 		}
-	}
+
+		/// <summary>
+		/// Logs an informational message.
+		/// </summary>
+		/// <param name="msg">The message to log.</param>
+		protected virtual void LogInfo(string msg) => PluginDelegator?.Information(msg);
+
+        /// <summary>
+        /// Logs an error message.
+        /// </summary>
+        /// <param name="msg">The message to log.</param>
+        protected virtual void LogError(string msg) => PluginDelegator?.Error(msg);
+
+        /// <summary>
+        /// Logs a warning message.
+        /// </summary>
+        /// <param name="msg">The message to log.</param>
+        protected virtual void LogWarning(string msg) => PluginDelegator?.Warning(msg);
+
+        /// <summary>
+        /// Logs a debug message.
+        /// </summary>
+        /// <param name="msg">The message to log.</param>
+        protected virtual void LogDebug(string msg) => PluginDelegator?.Debug(msg);
+
+        /// <summary>
+        /// Logs a verbose message.
+        /// </summary>
+        /// <param name="msg">The message to log.</param>
+        protected virtual void LogVerbose(string msg) => PluginDelegator?.Trace(msg);
+
+    }
 }
 
