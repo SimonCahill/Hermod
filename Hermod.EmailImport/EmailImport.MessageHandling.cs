@@ -14,9 +14,7 @@ namespace Hermod.EmailImport {
         /// <param name="e">The message.</param>
         private void PluginDelegator_MessageReceived(object? sender, MessageReceivedEventArgs e) {
             switch (e.Topic) {
-                case AddDomainTopic:
-                    HandleAddDomainMessageReceived(e.Topic, e.Message);
-                    break;
+                default: break;
             }
         }
 
