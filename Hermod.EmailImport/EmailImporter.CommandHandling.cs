@@ -75,6 +75,7 @@ namespace Hermod.EmailImport {
                         throw new Exception($"Failed to add domain { domain }! It was null.");
                     }
                     addedDomains.Add(newDomain);
+                    PublishMessage(DomainAddedTopic, newDomain);
                 } catch (Exception ex) {
                     failedDomains.Add(domain, ex.Message);
                 }
@@ -121,6 +122,7 @@ namespace Hermod.EmailImport {
                         } else if (r.Result is Domain d) {
                             if (m_dbConnector?.RemoveDomainAsync(d).GetAwaiter().GetResult() == true) {
                                 domainsRemoved++;
+                                PublishMessage(DomainRemovedTopic, domain);
                             } else {
                                 domainsNotRemoved.Add(domain, "Unknown error");
                             }
@@ -244,11 +246,13 @@ namespace Hermod.EmailImport {
             }
 
             try {
+                var user = m_dbConnector?.AddUserToDomainAsync(
+                    domain, args[1], args[2], Enum.Parse<AccountType>(args[3], true)
+                );
+                PublishMessage(UserAddedTopic.Replace("{domain}", domain.DomainName), user);
                 return new CommandResult(
                     $"Added { args[1] } to { domain.Tld }.{ domain.DomainName }",
-                    m_dbConnector?.AddUserToDomainAsync(
-                        domain, args[1], args[2], Enum.Parse<AccountType>(args[3], true)
-                    )
+                    user
                 );
             } catch (Exception ex) {
                 return new CommandErrorResult($"Failed to add user { args[1] } to domain { domain.DomainName }!", ex);
@@ -292,10 +296,14 @@ namespace Hermod.EmailImport {
                 return new CommandErrorResult($"Could not find user { args[1] } in domain { domain.DomainName }! Is this the correct domain?");
             }
 
-            return
-                m_dbConnector?.RemoveUserFromDomainAsync(domain, user).GetAwaiter().GetResult() == true ?
-                new CommandResult($"Removed user { user.AccountName } from { domain.DomainName }", null) :
-                new CommandErrorResult($"Failed to remove { user.AccountName } from { domain.DomainName }. Unknown error!");
+            var userRemoved = m_dbConnector?.RemoveUserFromDomainAsync(domain, user).GetAwaiter().GetResult() == true;
+
+            if (userRemoved) {
+                PublishMessage(UserRemovedTopic.Replace("{domain}", domain.DomainName), user.AccountName);
+                return new CommandResult($"Removed user { user.AccountName } from { domain.DomainName }", null);
+            }
+
+            return new CommandErrorResult($"Failed to remove { user.AccountName } from { domain.DomainName }. Unknown error!");
         }
 
     }
