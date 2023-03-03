@@ -71,20 +71,24 @@ namespace Hermod.PluginFramework {
         /// <param name="pluginFile">The file from which to load plugins.</param>
         /// <exception cref="FileNotFoundException">If the file does not exist.</exception>
         /// <exception cref="NotAPluginException">If the given file is not a valid <see cref="Assembly"/> or does not contain instances off <see cref="IPlugin"/> or <see cref="Plugin"/></exception>
-        internal void LoadPlugin(FileInfo pluginFile) {
-            AppLogger?.Information($"Attempting to load { pluginFile.FullName }...");
+        internal void LoadPlugin(FileInfo pluginFile, bool ignoreNonPlugins = false) {
+            AppLogger?.Debug($"Attempting to load { pluginFile.FullName }...");
             if (!pluginFile.Exists) { throw new FileNotFoundException("The file does not exist.", pluginFile.FullName); }
-            if (!IsAssembly(pluginFile)) { throw new NotAPluginException(pluginFile); }
+            if (!IsAssembly(pluginFile)) {
+                if (ignoreNonPlugins) { return; }
+                throw new NotAPluginException(pluginFile);
+            }
 
-            AppLogger?.Information("Loading assembly...");
+            AppLogger?.Debug("Loading assembly...");
             var assembly = Assembly.LoadFile(pluginFile.FullName);
 
             List<Type> pluginTypes;
             if (!ContainsPlugins(assembly, out pluginTypes)) {
+                if (ignoreNonPlugins) { return; }
                 throw new NotAPluginException(pluginFile);
             }
 
-            AppLogger?.Information($"Found { pluginTypes.Count } plugins in assembly...");
+            AppLogger?.Debug($"Found { pluginTypes.Count } plugins in assembly...");
             foreach (var pluginType in pluginTypes) {
                 RegisterPlugin(ref assembly, pluginType);
             }
@@ -156,7 +160,7 @@ namespace Hermod.PluginFramework {
                 plugin.OnLoad(pluginDelegator);
 
                 LastRegisteredPlugin = plugin;
-                AppLogger?.Information($"Loaded plugin { plugin.PluginName } { plugin.PluginVersion.ToString() }");
+                AppLogger?.Debug($"Loaded plugin { plugin.PluginName } { plugin.PluginVersion.ToString() }");
             } catch (Exception ex) {
                 AppLogger?.Error("Failed to load plugin from assembly!");
                 AppLogger?.Error($"Error: { ex.Message }");
@@ -198,11 +202,7 @@ namespace Hermod.PluginFramework {
 
         private Assembly? CurrentDomain_AssemblyResolve(object? sender, ResolveEventArgs args) {
             AppLogger?.Warning("Failed to resolve assembly {argname}", args.Name);
-            var loadedAssembly = AppDomain.CurrentDomain.GetAssemblies()?.Where(x => x.FullName == args.RequestingAssembly?.FullName)?.FirstOrDefault();
-            if (loadedAssembly is not null) {
-                return loadedAssembly;
-            }
-
+            
             var folderPath = Path.GetDirectoryName(args.RequestingAssembly?.Location);
             var asmName = new AssemblyName(args.Name);
             if (folderPath is null || asmName.Name is null) {
@@ -222,6 +222,7 @@ namespace Hermod.PluginFramework {
                 }
             }
 
+            AppLogger?.Debug("Resolved assembly @ {asmPath}", asmPath);
             return Assembly.LoadFrom(asmPath);
         }
 

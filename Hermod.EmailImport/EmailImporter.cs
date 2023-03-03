@@ -101,6 +101,17 @@ namespace Hermod.EmailImport {
                     "!! WARNING !! This process is irreversible!\n" +
                     "Usage: remove-user <domain> <user>",
                     Handle_RemoveUser
+                ),
+                new TerminalCommand(
+                    "load-account-cfg", "Loads the account configs into memory",
+                    "(re-)Loads all accounts from the database into memory, so Hermod can use them.",
+                    Handle_LoadAccountConfig
+                ),
+                new TerminalCommand(
+                    "save-account-cfg", "Dumps the account configs from memory",
+                    "Encrypts and them dumps all domains, accounts, and their current states to the\n" +
+                    "configured data source.",
+                    Handle_SaveAccountConfig
                 )
             };
         }
@@ -112,59 +123,11 @@ namespace Hermod.EmailImport {
         public override void OnLoad(IPluginDelegator pluginDelegator) {
             base.OnLoad(pluginDelegator);
 
-            if (PluginDelegator.GetApplicationConfig<bool>("Accounts.UseDatabase")) {
-                // dynamic dbInfo = PluginDelegator.GetApplicationConfig<object>("Accounts.DatabaseInfo");
-                // m_dbConnector = new MySqlDatabaseConnector(
-                //     dbInfo.Host,
-                //     dbInfo.DatabaseUser,
-                //     dbInfo.DatabasePass,
-                //     dbInfo.DatabaseName,
-                //     pluginDelegator
-                // );
+            if (PluginDelegator?.GetApplicationConfig<bool>("Accounts.UseDatabase") == true) {
                 throw new Exception("MySqlDatabaseConnector is not usable in this version!");
-            } else if (PluginDelegator.GetApplicationConfig<bool>("Accounts.UseJsonFile")) {
-                var filePath = PluginDelegator.GetApplicationConfig<string?>("Accounts.JsonFileInfo.FilePath");
-                if (filePath is null) {
-                    filePath = AppInfo.GetLocalHermodDirectory().GetSubFile(".accounts.json").FullName;
-                }
-
-                byte[] encKey = null;
-                byte[] initVec = null;
-
-                void GetEncryptionData(ref byte[] encKey, ref byte[] initVec) {
-                    var tmpKey = PluginDelegator?.GetApplicationConfig<byte[]>("Accounts.EncryptionKey");
-                    if (tmpKey is null || tmpKey.Length == 0) {
-                        PluginDelegator?.Information("Found invalid encryption keys! Generating new encryption data...");
-                        JsonDatabaseConnector.GenerateNewAesKey(out encKey, out initVec);
-
-                        PluginDelegator?.TrySetApplicationConfig("Accounts.EncryptionKey", encKey);
-                        PluginDelegator?.TrySetApplicationConfig("Accounts.EncryptionInitVec", initVec);
-                        return;
-                    }
-
-                    if (encKey is null) { encKey = new byte[tmpKey.Length]; }
-                    Array.Copy(tmpKey, encKey, tmpKey.Length);
-
-                    tmpKey = PluginDelegator?.GetApplicationConfig<byte[]>("Accounts.EncryptionInitVec");
-                    if (tmpKey is null || tmpKey.Length == 0) {
-                        PluginDelegator?.Information("Found invalid encryption keys! Generating new encryption data...");
-                        JsonDatabaseConnector.GenerateNewAesKey(out encKey, out initVec);
-
-                        PluginDelegator?.TrySetApplicationConfig("Accounts.EncryptionKey", encKey);
-                        PluginDelegator?.TrySetApplicationConfig("Accounts.EncryptionInitVec", initVec);
-                        return;
-                    }
-
-                    if (initVec is null) { initVec = new byte[tmpKey.Length]; }
-                    Array.Copy(tmpKey, initVec, tmpKey.Length);
-                }
-
-                GetEncryptionData(ref encKey, ref initVec);
-                m_dbConnector = new JsonDatabaseConnector(
-                    new FileInfo(filePath),
-                    encKey, initVec
-                );
-                m_dbConnector.Connect();
+            } else if (PluginDelegator?.GetApplicationConfig<bool>("Accounts.UseJsonFile") == true) {
+                SetupJsonDbConnector();
+                m_dbConnector?.Connect();
             } else {
                 throw new InvalidDataSourceException();
             }
@@ -184,6 +147,50 @@ namespace Hermod.EmailImport {
         public override void OnStop() {
             PluginDelegator?.Information("Stopping worker threads...");
             m_keepThreadAlive = false;
+        }
+
+        private void GetEncryptionData(ref byte[] encKey, ref byte[] initVec) {
+            var tmpKey = PluginDelegator?.GetApplicationConfig<byte[]>("Accounts.EncryptionKey");
+            if (tmpKey is null || tmpKey.Length == 0) {
+                PluginDelegator?.Information("Found invalid encryption keys! Generating new encryption data...");
+                JsonDatabaseConnector.GenerateNewAesKey(out encKey, out initVec);
+
+                PluginDelegator?.TrySetApplicationConfig("Accounts.EncryptionKey", encKey);
+                PluginDelegator?.TrySetApplicationConfig("Accounts.EncryptionInitVec", initVec);
+                return;
+            }
+
+            if (encKey is null) { encKey = new byte[tmpKey.Length]; }
+            Array.Copy(tmpKey, encKey, tmpKey.Length);
+
+            tmpKey = PluginDelegator?.GetApplicationConfig<byte[]>("Accounts.EncryptionInitVec");
+            if (tmpKey is null || tmpKey.Length == 0) {
+                PluginDelegator?.Information("Found invalid encryption keys! Generating new encryption data...");
+                JsonDatabaseConnector.GenerateNewAesKey(out encKey, out initVec);
+
+                PluginDelegator?.TrySetApplicationConfig("Accounts.EncryptionKey", encKey);
+                PluginDelegator?.TrySetApplicationConfig("Accounts.EncryptionInitVec", initVec);
+                return;
+            }
+
+            if (initVec is null) { initVec = new byte[tmpKey.Length]; }
+            Array.Copy(tmpKey, initVec, tmpKey.Length);
+        }
+
+        private void SetupJsonDbConnector() {
+            var filePath = PluginDelegator?.GetApplicationConfig<string?>("Accounts.JsonFileInfo.FilePath");
+            if (filePath is null) {
+                filePath = AppInfo.GetLocalHermodDirectory().GetSubFile(".accounts.json").FullName;
+            }
+
+            byte[] encKey = null;
+            byte[] initVec = null;
+
+            GetEncryptionData(ref encKey, ref initVec);
+            m_dbConnector = new JsonDatabaseConnector(
+                new FileInfo(filePath),
+                encKey, initVec
+            );
         }
     }
 }

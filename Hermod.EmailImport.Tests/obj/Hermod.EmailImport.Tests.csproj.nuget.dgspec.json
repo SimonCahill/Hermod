@@ -133,7 +133,7 @@
             },
             "getopt.net-bsd": {
               "target": "Package",
-              "version": "[0.4.0, )"
+              "version": "[0.5.0, )"
             }
           },
           "imports": [
@@ -272,6 +272,16 @@
       "frameworks": {
         "net7.0": {
           "targetAlias": "net7.0",
+          "dependencies": {
+            "MailKit": {
+              "target": "Package",
+              "version": "[3.5.0, )"
+            },
+            "System.Data.SqlClient": {
+              "target": "Package",
+              "version": "[4.8.5, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",

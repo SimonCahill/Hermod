@@ -4,6 +4,7 @@ namespace Hermod.EmailImport {
 
     using Core.Accounts;
     using Core.Commands.Results;
+    using Data;
 
     using System.Text;
 
@@ -304,6 +305,32 @@ namespace Hermod.EmailImport {
             }
 
             return new CommandErrorResult($"Failed to remove { user.AccountName } from { domain.DomainName }. Unknown error!");
+        }
+
+        private ICommandResult Handle_LoadAccountConfig(params string[] args) {
+            if (m_dbConnector is not JsonDatabaseConnector jdb) {
+                return new CommandErrorResult("Cannot load config from non-file based database!");
+            }
+
+            try {
+                jdb.ReadFile();
+                return new CommandResult("Loaded accounts.", null);
+            } catch (Exception ex) {
+                return new CommandErrorResult("Failed to load accounts!", ex);
+            }
+        }
+
+        private ICommandResult Handle_SaveAccountConfig(params string[] args) {
+            if (m_dbConnector is not JsonDatabaseConnector jdb) {
+                return new CommandErrorResult("Cannot save config to non-file based database!");
+            }
+
+            try {
+                jdb.DumpJson();
+                return new CommandResult("Saved accounts.", null);
+            } catch (Exception ex) {
+                return new CommandErrorResult("Failed to save accounts!", ex);
+            }
         }
 
     }
