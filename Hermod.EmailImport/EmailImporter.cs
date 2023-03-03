@@ -21,10 +21,25 @@ namespace Hermod.EmailImport {
     [Plugin(nameof(EmailImporter), "0.0.1", "Simon Cahill", "contact@simonc.eu", "https://simonc.eu")]
     public partial class EmailImporter: Plugin {
 
-        
+        #region Publish Topics
+        const string DomainAddedTopic = "/hermod/domains/added";
+        const string DomainRemovedTopic = "/hermod/domains/removed";
+        const string UserAddedTopic = "/hermod/domains/user/added/{domain}";
+        const string UserRemovedTopic = "/hermod/domains/user/removed/{domain}";
+        #endregion
+
+        #region Subscribe Topics
+        const string AddDomainRequestTopic = "/hermod/domains/add";
+        const string AddDomainUserRequestTopic = "/hermod/domains/user/add/+";
+        const string RemoveDomainRequestTopic = "/hermod/domains/remove";
+        const string RemoveDomainUserRequestTopic = "/hermod/domains/user/remove/+";
+        #endregion
 
         private readonly string[] m_subscribeTopics = {
-            
+            AddDomainRequestTopic,
+            AddDomainUserRequestTopic,
+            RemoveDomainRequestTopic,
+            RemoveDomainUserRequestTopic
         };
 
         volatile bool m_keepThreadAlive = false;
