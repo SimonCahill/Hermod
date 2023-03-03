@@ -21,18 +21,10 @@ namespace Hermod.EmailImport {
     [Plugin(nameof(EmailImporter), "0.0.1", "Simon Cahill", "contact@simonc.eu", "https://simonc.eu")]
     public partial class EmailImporter: Plugin {
 
-        const string GetDomainTopicAllSuffix    = "all";
-        const string AddDomainTopic             = "/hermod/domain/add"; /// The topic EmailImport subscribes to add a new domain
-        const string GetDomainTopic             = "/hermod/domain/get/+"; /// The topic EmailImport subscribes when another plugin requests a domain
-        const string RemoveDomainTopic          = "/hermod/domain/remove/+"; /// The topic EmailImport subscribes to when a domain shall be removed.
-        const string GetDomainResponseTopic     = "/hermod/domain/response"; /// The topic EmailImport publishes to when a topic was requested
-        const string GetDomainUserTopic         = "/hermod/user/get"; /// The topic EmailImport subscribes to when a user is requested
-        const string AddDomainUserTopic         = "/hermod/user/add/+"; /// The topic EmailImport subscribes to when a user is to be added to a domain
-        const string RemoveDomainUserTopic      = "/hermod/user/remove"; /// The topic EmailImport subscribes to when a user is to be removed from a domain
+        
 
         private readonly string[] m_subscribeTopics = {
-            AddDomainTopic, GetDomainTopic, RemoveDomainTopic, GetDomainUserTopic,
-            AddDomainUserTopic, RemoveDomainUserTopic
+            
         };
 
         volatile bool m_keepThreadAlive = false;
