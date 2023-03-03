@@ -93,6 +93,21 @@ namespace Hermod.PluginFramework {
 
 			return PluginDelegator.ExecuteCommand(args);
 		}
+
+		/// <summary>
+		/// Publishes a message to the internal broker.
+		/// </summary>
+		/// <param name="topic">The topic on which to publish the message.</param>
+		/// <param name="message">The message object.</param>
+		/// <exception cref="ArgumentNullException">If the topic was empty or null.</exception>
+		/// <exception cref="NullReferenceException">If <see cref="PluginDelegator"/> was null.</exception>
+		protected virtual void PublishMessage(string topic, object? message) {
+			if (string.IsNullOrEmpty(topic?.Trim())) { throw new ArgumentNullException(nameof(topic), "Topic must not be null or empty!"); }
+
+			if (PluginDelegator is null) { throw new NullReferenceException($"Plugin delegator was null! Did you override { nameof(OnLoad) }?"); }
+
+			PluginDelegator.PublishMessage(topic, message);
+		}
 	}
 }
 
