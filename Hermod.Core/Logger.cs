@@ -61,6 +61,7 @@ namespace Hermod.Core {
 			if (EnableDebugOutput) {
 				logCfg.WriteTo.Debug(LogEventLevel.Debug);
 			}
+
 			if (EnableFileOutput && LogFilePath != null) {
 				logCfg.WriteTo.File(
 					new JsonFormatter(),
@@ -73,6 +74,8 @@ namespace Hermod.Core {
 
 				);
 			}
+
+			logCfg.MinimumLevel.Verbose();
 
 			m_logger = logCfg.CreateLogger();
 			return m_logger;
