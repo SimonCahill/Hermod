@@ -70,7 +70,7 @@ namespace Hermod {
         };
 
         private ICommandResult HandleDisplayHelp(params string[] args) {
-            if (args.Length > 0) { return HandleDisplayCommandHelp(args.First()); }
+            if (args.Length > 0) { return HandleDisplayCommandHelp(args[1]); }
 
             var sBuilder = new StringBuilder();
 
