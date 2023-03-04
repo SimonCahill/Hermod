@@ -98,7 +98,10 @@ namespace Hermod.PluginFramework {
                 return new CommandErrorResult($"The command { commands[0] } does not exist in Hermod's namespace! Are the correct plugins loaded?");
             }
 
-            return cmd.Execute(commands);
+            if (commands.Length > 1) {
+                return cmd.Execute(commands[1..]);
+            }
+            return cmd.Execute();
         }
 
     }

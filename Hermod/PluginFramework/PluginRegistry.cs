@@ -153,7 +153,7 @@ namespace Hermod.PluginFramework {
                 }
 
                 LoadedAssemblies[assembly].Add(type, plugin);
-                var pluginDelegator = new PluginDelegator(plugin);
+                var pluginDelegator = new PluginDelegator(plugin, AppLogger);
                 PluginDelegators.Add(pluginDelegator);
 
                 plugin = LoadedAssemblies[assembly][type];
