@@ -112,6 +112,14 @@ namespace Hermod.EmailImport {
                     "Encrypts and them dumps all domains, accounts, and their current states to the\n" +
                     "configured data source.",
                     Handle_SaveAccountConfig
+                ),
+                new TerminalCommand(
+                    "do-import", "Synchronously imports all known domains",
+                    "If no arguments are passed, do-import will synchronously import all emails\n" +
+                    "from all known domains and accounts.\n" +
+                    "This process cannot be stopped once started!\n" +
+                    "Usage: do-import [domains]",
+                    Handle_DoImport
                 )
             };
         }
