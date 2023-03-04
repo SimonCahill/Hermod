@@ -46,13 +46,12 @@ namespace Hermod.EmailImport {
             var sBuilder = new StringBuilder().AppendLine("Got domain(s):");
 
             foreach (var domain in domains) {
-                sBuilder.Append($"\t{ domain.ToString() }");
+                sBuilder.AppendLine($"\t{ domain.ToString() }:")
+                        .AppendLine($"\tServer: { domain.ServerAddress }:{ domain.ServerPort }");
 
                 if (domain.DomainUsers.Any()) {
-                    sBuilder.AppendLine(":");
-
                     foreach (var user in domain.DomainUsers) {
-                        sBuilder.AppendLine($"\t\t{ user.AccountName } PW: ***** Salt: ********** [{ user.AccountType.ToString() }]");
+                        sBuilder.AppendLine($"\t - { user.AccountName } PW: ***** Salt: ********** [{ user.AccountType.ToString() }]");
                     }
                     sBuilder.AppendLine();
                 }
@@ -212,7 +211,8 @@ namespace Hermod.EmailImport {
                     $"Got user { user.AccountName } in { domain.ToString() }.\n" +
                     $"\tAccount type: { user.AccountType.ToString() }\n" +
                     $"\tPassword: **********\n" +
-                    $"\tPassword hash: **********",
+                    $"\tPassword hash: **********\n" +
+                    $"\tLast import: { user.LastEmailRetrieval }",
                     user
                 );
         }
@@ -331,6 +331,30 @@ namespace Hermod.EmailImport {
             } catch (Exception ex) {
                 return new CommandErrorResult("Failed to save accounts!", ex);
             }
+        }
+
+        private ICommandResult Handle_DoImport(params string[] args) {
+            if (args is null || args.Length == 0) {
+                LogInfo("Synchronously importing ALL domains and users!");
+                var domainsResult = ExecuteCommand("get-domains");
+                if (domainsResult is not null && domainsResult is not CommandErrorResult) {
+                    if (domainsResult is CommandResult cr && cr.Result is IEnumerable<Domain> domains) {
+                        var emailsImported = 0;
+                        foreach (var domain in domains) {
+                            emailsImported += ImportEmailsFromDomain(
+                                GetImportDirectoryAsync()
+                                    .GetAwaiter()
+                                    .GetResult()
+                                    .CreateSubdirectory(domain.ToString()
+                                ),
+                                domain
+                            ).GetAwaiter().GetResult();
+                        }
+                    }
+                }
+            }
+
+            return new CommandResult("Imported.", null);
         }
 
     }
