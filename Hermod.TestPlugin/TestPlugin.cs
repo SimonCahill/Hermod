@@ -22,11 +22,11 @@ namespace Hermod.TestPlugin {
 			PluginCommands.Add(new TerminalCommand("error-test", "This will test error behaviours", "This test will return an error to test how Hermod handles it.", HandleTestErrorCommand));
 		}
 
-		private ICommandResult HandleTestCommand(params string[] args) {
+		private ICommandResult HandleTestCommand(TerminalCommand command, params string[] args) {
 			return new CommandResult("This was a test! Thank you for participating!", null);
 		}
 
-		private ICommandResult HandleTestErrorCommand(params string[] args) {
+		private ICommandResult HandleTestErrorCommand(TerminalCommand command, params string[] args) {
 			return new CommandErrorResult("This was yet another test :)");
 		}
 

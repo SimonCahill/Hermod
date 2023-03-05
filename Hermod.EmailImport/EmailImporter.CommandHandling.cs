@@ -5,12 +5,12 @@ namespace Hermod.EmailImport {
     using Core.Accounts;
     using Core.Commands.Results;
     using Data;
-
+    using Hermod.Core.Commands;
     using System.Text;
 
     partial class EmailImporter {
 
-        private ICommandResult Handle_GetDomains(params string[] args) {
+        private ICommandResult Handle_GetDomains(TerminalCommand command, params string[] args) {
             var domains = m_dbConnector?.GetDomainsAsync(true, args).GetAwaiter().GetResult();
 
             if (domains is null || !domains.Any()) { return new CommandErrorResult("No domains found matching criteria!"); }
@@ -33,7 +33,7 @@ namespace Hermod.EmailImport {
             return new CommandResult(sBuilder.ToString(), domains);
         }
 
-        private ICommandResult Handle_GetSingleDomain(params string[] args) {
+        private ICommandResult Handle_GetSingleDomain(TerminalCommand command, params string[] args) {
             if (args is null || args.Length == 0) {
                 return new CommandErrorResult("At least one domain must be supplied!");
             }
@@ -60,7 +60,7 @@ namespace Hermod.EmailImport {
             return new CommandResult(sBuilder.ToString(), domains);
         }
 
-        private ICommandResult Handle_AddDomain(params string[] args) {
+        private ICommandResult Handle_AddDomain(TerminalCommand command, params string[] args) {
             if (args.Length == 0) {
                 return new CommandErrorResult("Missing input parameters!");
             }
@@ -95,7 +95,7 @@ namespace Hermod.EmailImport {
             return result;
         }
 
-        private ICommandResult Handle_RemoveDomain(params string[] args) {
+        private ICommandResult Handle_RemoveDomain(TerminalCommand command, params string[] args) {
             if (args is null || args.Length == 0) {
                 return new CommandErrorResult("Unexpected end of domains!", new ArgumentNullException(nameof(args), "Domains must not be empty!"));
             }
@@ -145,7 +145,7 @@ namespace Hermod.EmailImport {
             return new CommandResult($"Removed { domainsRemoved } domains.", null);
         }
 
-        private ICommandResult Handle_GetUsers(params string[] args) {
+        private ICommandResult Handle_GetUsers(TerminalCommand command, params string[] args) {
             if (args is null || args.Length == 0) {
                 return new CommandErrorResult(
                     "At least one domain must be supplied!",
@@ -175,7 +175,7 @@ namespace Hermod.EmailImport {
             return new CommandResult(sBuilder.ToString(), users);
         }
 
-        private ICommandResult Handle_GetUser(params string[] args) {
+        private ICommandResult Handle_GetUser(TerminalCommand command, params string[] args) {
             if (args is null || args.Length < 2) {
                 return new CommandErrorResult($"Unsufficient arguments supplied: { ExecuteCommand("help", "get-user")?.Message }");
             }
@@ -217,7 +217,7 @@ namespace Hermod.EmailImport {
                 );
         }
 
-        private ICommandResult Handle_AddUser(params string[] args) {
+        private ICommandResult Handle_AddUser(TerminalCommand command, params string[] args) {
             PluginDelegator?.Warning("An attempt is being made to add a new user to a domain!");
 
             if (args is null || args.Length != 4) {
@@ -262,7 +262,7 @@ namespace Hermod.EmailImport {
             }
         }
 
-        private ICommandResult Handle_RemoveUser(params string[] args) {
+        private ICommandResult Handle_RemoveUser(TerminalCommand command, params string[] args) {
             if (args is null || args.Length == 0) {
                 return new CommandErrorResult(
                     $"Missing input parameters!\n{ ExecuteCommand("help", "remove-user")?.Message }"
@@ -307,7 +307,7 @@ namespace Hermod.EmailImport {
             return new CommandErrorResult($"Failed to remove { user.AccountName } from { domain.DomainName }. Unknown error!");
         }
 
-        private ICommandResult Handle_LoadAccountConfig(params string[] args) {
+        private ICommandResult Handle_LoadAccountConfig(TerminalCommand command, params string[] args) {
             if (m_dbConnector is not JsonDatabaseConnector jdb) {
                 return new CommandErrorResult("Cannot load config from non-file based database!");
             }
@@ -320,7 +320,7 @@ namespace Hermod.EmailImport {
             }
         }
 
-        private ICommandResult Handle_SaveAccountConfig(params string[] args) {
+        private ICommandResult Handle_SaveAccountConfig(TerminalCommand command, params string[] args) {
             if (m_dbConnector is not JsonDatabaseConnector jdb) {
                 return new CommandErrorResult("Cannot save config to non-file based database!");
             }
@@ -333,7 +333,7 @@ namespace Hermod.EmailImport {
             }
         }
 
-        private ICommandResult Handle_DoImport(params string[] args) {
+        private ICommandResult Handle_DoImport(TerminalCommand command, params string[] args) {
             if (args is null || args.Length == 0) {
                 LogInfo("Synchronously importing ALL domains and users!");
                 var domainsResult = ExecuteCommand("get-domains");

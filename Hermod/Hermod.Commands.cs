@@ -6,6 +6,8 @@ namespace Hermod {
     using Core.Commands.Results;
     using PluginFramework;
 
+    using getopt.net;
+
     using System.Text;
 
     public partial class Hermod {
@@ -32,14 +34,17 @@ namespace Hermod {
         List<ICommand> Commands => m_commands ??= new List<ICommand> {
             new TerminalCommand(
                 "clear", "Clears the terminal of any text",
-                "Clears the internal buffers of the terminal.",
-                x => { Console.Clear(); return CommandResult.Empty; }
+                "Clears the internal buffers of the terminal.\n" +
+                "Usage: clear [-s/--secure]\n\n" +
+                "Arguments:\n" +
+                "\t--secure, -s\tSecurely clears the terminal.",
+                HandleClearCommand, new Option("secure", ArgumentType.None, 's')
             ),
             new TerminalCommand(
                 "quit", "Gracefully terminates Hermod.",
                 "Unloads all plugins, shuts down internal services,\n" +
                 "and gracfully shuts Hermod down. Useful for maintenance.",
-                x => { m_keepAlive = false; return CommandResult.Empty; }
+                (cmd, args) => { m_keepAlive = false; return CommandResult.Empty; }
             ),
             new TerminalCommand(
                 "help", "Displays a help text",
@@ -75,8 +80,28 @@ namespace Hermod {
             )
         };
 
-        private ICommandResult HandleDisplayHelp(params string[] args) {
-            if (args.Length > 0) { return HandleDisplayCommandHelp(args[1]); }
+        private ICommandResult HandleClearCommand(TerminalCommand command, params string[] args) {
+            bool secureClear = false;
+
+            int optChar = 0;
+            while ((optChar = command.ParseArgs(ref args, out var optArg)) != -1) {
+                if (optChar == 's') {
+                    secureClear = true;
+                }
+            }
+
+            if (secureClear) {
+                // TODO
+                Console.Write("\x1bc");
+            } else {
+                Console.Clear();
+            }
+
+            return CommandResult.Empty;
+        }
+
+        private ICommandResult HandleDisplayHelp(TerminalCommand command, params string[] args) {
+            if (args.Length > 0) { return HandleDisplayCommandHelp(command, args[1]); }
 
             var sBuilder = new StringBuilder();
 
@@ -86,16 +111,16 @@ namespace Hermod {
 
             sBuilder.AppendLine("Built-ins:");
 
-            foreach (var command in Commands) {
-                DumpCommandShortHelp(command);
+            foreach (var cmd in Commands) {
+                DumpCommandShortHelp(cmd);
             }
             sBuilder.AppendLine();
 
             sBuilder.AppendLine("Plugin provided:");
             foreach (var plugin in PluginRegistry.Instance.Plugins) {
                 sBuilder.AppendLine($" - { plugin.PluginName }:");
-                foreach (var command in plugin.PluginCommands) {
-                    DumpCommandShortHelp(command);
+                foreach (var cmd in plugin.PluginCommands) {
+                    DumpCommandShortHelp(cmd);
                 }
                 sBuilder.AppendLine();
             }
@@ -103,18 +128,18 @@ namespace Hermod {
             return new CommandResult(sBuilder.ToString(), null);
         }
 
-        private ICommandResult HandleDisplayCommandHelp(string arg) {
-            var command =
+        private ICommandResult HandleDisplayCommandHelp(TerminalCommand command, string arg) {
+            var cmd =
                 PluginRegistry.Instance.GetAllCommands()
                                        .FirstOrDefault(c => c.Name.Equals(arg, StringComparison.InvariantCulture));
-            if (command is null) {
+            if (cmd is null) {
                 return new CommandErrorResult($"Command \"{ arg }\" doesn't exist!");
             }
 
-            return new CommandResult(command.LongDescription, null);
+            return new CommandResult(cmd.LongDescription, null);
         }
 
-        private ICommandResult HandleLoadPlugin(params string[] args) {
+        private ICommandResult HandleLoadPlugin(TerminalCommand command, params string[] args) {
             if (args.Length == 0) {
                 return new CommandErrorResult("Missing input parameters!", new ArgumentNullException(nameof(args), "Input args must not be null or empty!"));
             }
@@ -137,11 +162,11 @@ namespace Hermod {
             return new CommandResult($"Successfully loaded plugin(s).", null);
         }
 
-        private ICommandResult HandleUnloadPlugin(params string[] args) {
+        private ICommandResult HandleUnloadPlugin(TerminalCommand command, params string[] args) {
             return new CommandErrorResult("This command has not yet been implemented!");
         }
 
-        private ICommandResult HandleGetPlugins(params string[] args) {
+        private ICommandResult HandleGetPlugins(TerminalCommand command, params string[] args) {
             var sBuilder = new StringBuilder();
             PluginRegistry.Instance.Plugins
                 .Select(x => $"{ x.PluginName } v{ x.PluginVersion }")
@@ -151,7 +176,7 @@ namespace Hermod {
             return new CommandResult(sBuilder.ToString(), null);
         }
 
-        private ICommandResult HandleGetTopics(params string[] args) {
+        private ICommandResult HandleGetTopics(TerminalCommand command, params string[] args) {
             var topicSubscriptions = PluginRegistry.Instance.TopicSubscriptions;
 
             if (topicSubscriptions.Count == 0) {
